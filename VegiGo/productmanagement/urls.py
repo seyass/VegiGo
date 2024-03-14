@@ -10,7 +10,8 @@ urlpatterns = [
     path('add_product/',views.add_product,name='add_product'),
     path('create_category/',views.create_category,name='create_category'),
     path('edit_category/<int:catId>/',views.edit_category,name='edit_category'),
-    path('deleteCategory/<int:catId>/',views.delete_category,name='deleteCategory')
+    path('deleteCategory/<int:catId>/',views.delete_category,name='deleteCategory'),
+    path('edit_product/<int:proId>/',views.edit_product,name='edit_product')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

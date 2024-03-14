@@ -76,6 +76,8 @@ def signin_page(request):
     
 
 def logout_page(reqest):
+
+    
     return redirect('signin_page')
 
 def admin_page(request):

@@ -2,43 +2,164 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  Create Product - Admin Panel
+Add Product - Admin Panel
 {% endblock %}
 
 {% block content %}
-  <div class="container mt-5">
-    <h1>Create Product</h1>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="form-group">
-        <label for="name">Name:</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-      </div>
-      <div class="form-group">
-        <label for="description">Description:</label>
-        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="price">Price:</label>
-        <input type="number" class="form-control" id="price" name="price" step="0.01" required>
-      </div>
-      <div class="form-group">
-        <label for="selling_price">Selling Price:</label>
-        <input type="number" class="form-control" id="selling_price" name="selling_price" step="0.01" required>
-      </div>
-      <div class="form-group">
-        <label for="quantity">Quantity:</label>
-        <input type="number" class="form-control" id="quantity" name="quantity" required>
-      </div>
-      <div class="form-group">
-        <label for="primary_image">Primary Image:</label>
-        <input type="file" class="form-control-file" id="primary_image" name="primary_image" required>
-      </div>
-      <div class="form-group">
-        <label for="secondary_images">Secondary Images:</label>
-        <input type="file" class="form-control-file" id="secondary_images" name="secondary_images" multiple>
-      </div>
-      <button type="submit" class="btn btn-primary">Create</button>
-    </form>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h1>Add Product</h1>
+      <form method="post" enctype="multipart/form-data" id="product-form">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="category">Category:</label>
+          <select class="form-control" id="category" name="category" required>
+            {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="price">Price:</label>
+          <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="selling_price">Selling Price:</label>
+          <input type="number" class="form-control" id="selling_price" name="selling_price" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantity:</label>
+          <input type="number" class="form-control" id="quantity" name="quantity" required>
+        </div>
+        <div class="form-group">
+          <label for="primary_image">Primary Image:</label>
+          <input type="file" class="form-control-file" id="primary_image" name="primary_image" required>
+          <img id="primary-preview-image" src="#" alt="Primary Image Preview" style="max-width: 100%; display: none;">
+          <input type="hidden" id="primary-crop-x" name="primary_crop_x">
+          <input type="hidden" id="primary-crop-y" name="primary_crop_y">
+          <input type="hidden" id="primary-crop-width" name="primary_crop_width">
+          <input type="hidden" id="primary-crop-height" name="primary_crop_height">
+        </div>
+        <div class="form-group">
+          <label for="secondary_images">Secondary Images:</label>
+          <input type="file" class="form-control-file" id="secondary_images" name="secondary_images" multiple>
+          <div id="secondary-preview-images"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Product</button>
+      </form>
+    </div>
   </div>
+</div>
+
+<!-- Include Bootstrap and Cropper.js -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Primary Image Cropper
+  var primaryImageInput = document.getElementById('primary_image');
+  var primaryCropper;
+
+  primaryImageInput.addEventListener('change', function (event) {
+    var input = event.target;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var img = document.getElementById('primary-preview-image');
+      img.src = reader.result;
+      img.style.display = 'block';
+
+      primaryCropper = new Cropper(img, {
+        aspectRatio: NaN,
+        viewMode: 1,
+        autoCropArea: 1,
+      });
+    };
+    reader.readAsDataURL(input.files[0]);
+  });
+
+  // Secondary Image Cropper
+  var secondaryImagesInput = document.getElementById('secondary_images');
+
+  secondaryImagesInput.addEventListener('change', function (event) {
+    var input = event.target;
+    for (var i = 0; i < input.files.length; i++) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var img = document.createElement('img');
+        img.src = reader.result;
+        img.style.maxWidth = '100px';
+        img.classList.add('img-thumbnail');
+
+        var secondaryPreviewImages = document.getElementById('secondary-preview-images');
+        secondaryPreviewImages.appendChild(img);
+
+        var cropper = new Cropper(img, {
+          aspectRatio: NaN,
+          viewMode: 1,
+          autoCropArea: 1,
+        });
+      };
+      reader.readAsDataURL(input.files[i]);
+    }
+  });
+
+  // Handle form submission
+  document.getElementById('product-form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent default form submission
+
+    var formData = new FormData(this);
+    
+    // Add primary image data to form data
+    if (primaryCropper) {
+      var primaryCroppedCanvas = primaryCropper.getCroppedCanvas();
+      primaryCroppedCanvas.toBlob(function (blob) {
+        formData.append('primary_image', blob, 'primary_image.jpg');
+      }, 'image/jpeg');
+    }
+
+    // Add secondary image data to form data
+    var secondaryImages = document.querySelectorAll('#secondary-preview-images img');
+    for (var i = 0; i < secondaryImages.length; i++) {
+      var cropper = new Cropper(secondaryImages[i], {
+        aspectRatio: NaN,
+        viewMode: 1,
+        autoCropArea: 1,
+      });
+      var secondaryCroppedCanvas = cropper.getCroppedCanvas();
+      secondaryCroppedCanvas.toBlob(function (blob) {
+        formData.append('secondary_images', blob, 'secondary_image_' + i + '.jpg');
+      }, 'image/jpeg');
+    }
+
+    // Send form data to server
+    fetch('{% url "add_product" %}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}'
+      }
+    })
+      .then(response => {
+        if (response.ok) {
+          // Product added successfully, redirect to product list page
+          window.location.href = '{% url "products" %}';
+        } else {
+          console.error('Failed to add product');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
+});
+</script>
 {% endblock %}
