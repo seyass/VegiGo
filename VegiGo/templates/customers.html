@@ -1,0 +1,55 @@
+<!-- customers.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Customers - Admin Panel
+{% endblock %}
+
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'admin_page' %}">Admin</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Customers</li>
+    </ol>
+  </nav>
+  
+  <h1>Customers</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customers %}
+      <tr>
+        <td>{{ customer.username }}</td>
+        <td>{{ customer.email }}</td>
+        <td>
+          {% if customer.is_blocked == False %}
+            <p>Active</p>
+          {% else %}
+            <p>Blocked</p>
+          {% endif %}
+        </td>
+        </td>
+        <td>
+          <form method="post" action="{% url 'customers' customer.id %}">
+              {% csrf_token %}
+              {% if customer.is_blocked == False %}
+                  <button class="btn btn-danger" type="submit" name="status" value="blocked">Block</button>
+              {% else %}
+                  <button class="btn btn-success" type="submit" name="status" value="active">Unblock</button>
+              {% endif %}
+          </form>
+      </td>
+      
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

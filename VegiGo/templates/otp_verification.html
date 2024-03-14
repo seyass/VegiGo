@@ -1,0 +1,59 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="author" content="CodeHim">
+   <title>OTP Verify Mockup Example</title>
+   <!-- Style CSS -->
+   <link rel="stylesheet" href="{% static 'css/otpstyle.css' %}">
+   <!-- Demo CSS (No need to include it into your project) -->
+   <link rel="stylesheet" href="{% static 'css/otpsyle.css' %}">
+   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'>
+</head>
+<body>
+   <header class="cd__intro">
+      <h1>OTP Verify Mockup Example</h1>
+      <p>OTP Verify Mockup</p>
+      <div class="cd__action">
+         <a href="https://www.codehim.com/bootstrap/otp-input-field-using-bootstrap-5" title="Back to download and tutorial page" class="cd__btn back">Back to Tutorial</a>
+      </div>
+   </header>
+   <!--$%adsense%$-->
+   <main class="cd__main">
+      <div class="container-fluid bg-body-tertiary d-block">
+         <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4" style="min-width: 500px;">
+               <div class="card bg-white mb-5 mt-5 border-0" style="box-shadow: 0 12px 15px rgba(0, 0, 0, 0.02);">
+                  <div class="card-body p-5 text-center">
+                     <h4>Verify</h4>
+                     <p>Your code was sent to you via email</p>
+                     <form method="POST" action="{% url 'otp_verification' %}">
+                        {% csrf_token %}
+                        <div class="otp-field mb-4">
+                           <input type="number" name="otp1" />
+                           <input type="number" name="otp2" disabled />
+                           <input type="number" name="otp3" disabled />
+                           <input type="number" name="otp4" disabled />
+                           <input type="number" name="otp5" disabled />
+                           <input type="number" name="otp6" disabled />
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-3">Verify</button>
+                     </form>
+                     <p class="resend text-muted mb-0">Didn't receive code? <a href="">Request again</a></p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="footer">Made with ❤️ by Marcus | Visit <a href="https://shopblocks.com" target="_blank">Shopblocks</a></div>
+   </main>
+   <footer class="cd__credit">Author: Marcus - Distributed By: <a title="Free web design code & scripts" href="https://www.codehim.com?source=demo-page" target="_blank">CodeHim</a></footer>
+   
+   <!-- Script JS -->
+   <script src="{% static 'js/otpjs.js' %}"></script>
+   <!--$%analytics%$-->
+</body>
+</html>

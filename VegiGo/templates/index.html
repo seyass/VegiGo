@@ -63,10 +63,7 @@
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <div class="login-box">
-                        <select id="basic" class="selectpicker show-tick form-control" data-placeholder="Sign In">
-                            <option>Register Here</option>
-                            <option>Sign In</option>
-                        </select>
+                        <a class="btn hvr-hover" href="{% url 'signin_page' %}">Sign in</a>
                     </div>
                     <div class="text-slid-box">
                         <div id="offer-box" class="carouselTicker">
@@ -229,31 +226,27 @@
 
 
     <!-- Start Categories  -->
+
+<!-- categories_shop.html -->
+
 <div class="categories-shop">
     <div class="container">
         <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+            {% for category in categories %}
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="shop-cat-box">
-                    <img class="img-fluid" src="{% static 'images/categories_img_01.jpg' %}" alt="" />
-                    <a class="btn hvr-hover" href="#">Lorem ipsum dolor</a>
+                    <div class="image-container">
+                        <img class="img-fluid square-image" src="{{ category.image.url }}" alt="{{ category.name }}" />
+                    </div>
+                    <a class="btn hvr-hover" href="#">{{ category.name }}</a>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                <div class="shop-cat-box">
-                    <img class="img-fluid" src="{% static 'images/categories_img_02.jpg' %}" alt="" />
-                    <a class="btn hvr-hover" href="#">Lorem ipsum dolor</a>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                <div class="shop-cat-box">
-                    <img class="img-fluid" src="{% static 'images/categories_img_03.jpg' %}" alt="" />
-                    <a class="btn hvr-hover" href="#">Lorem ipsum dolor</a>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 <!-- End Categories -->
+
 
 <div class="box-add-products">
     <div class="container">
@@ -526,6 +519,10 @@
 <script src="{% static 'js/form-validator.min.js' %}"></script>
 <script src="{% static 'js/contact-form-script.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
+
+
+
+
 
 </body>
 

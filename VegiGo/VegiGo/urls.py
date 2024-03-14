@@ -19,5 +19,9 @@ from django.urls import path,include
 
 
 urlpatterns = [
-    path('',include('home.urls'))
+    path('',include('home.urls')),
+    path('',include('authentication.urls')),
+    path('',include('vgadmin.urls')) ,
+    path("",include('productmanagement.urls')) #, Auth routes - login / register
+    
 ]

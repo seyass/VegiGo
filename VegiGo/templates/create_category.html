@@ -1,0 +1,64 @@
+<!-- create_category.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  {% if edit_mode %}
+    Edit Category - Admin Panel
+  {% else %}
+    Create Category - Admin Panel
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h1>{% if edit_mode %}Edit Category{% else %}Create Category{% endif %}</h1>
+    <form method="post" enctype="multipart/form-data" id="category-form">
+      {% csrf_token %}
+      <input type="hidden" name="edit_mode" value="{% if edit_mode %}1{% else %}0{% endif %}">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" id="name" name="name" {% if edit_mode %} value="{{ category.name }}" {% endif %} required>
+      </div>
+      <div class="form-group">
+        <label for="image">Image:</label>
+        <input type="file" class="form-control-file" id="image" name="image" required>
+        <img id="preview-image" src="#" alt="Preview" style="max-width: 100%; display: none;">
+      </div>
+      <input type="hidden" id="crop-x" name="crop_x">
+      <input type="hidden" id="crop-y" name="crop_y">
+      <input type="hidden" id="crop-width" name="crop_width">
+      <input type="hidden" id="crop-height" name="crop_height">
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required>{% if edit_mode %}{{ category.description }}{% endif %}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">{% if edit_mode %}Save Changes{% else %}Create{% endif %}</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('image').addEventListener('change', function(event) {
+      var input = event.target;
+      var reader = new FileReader();
+      reader.onload = function(){
+        var img = document.getElementById('preview-image');
+        img.src = reader.result;
+        img.style.display = 'block';
+
+        // Initialize Cropper
+        var cropper = new Cropper(img, {
+          aspectRatio: 1, // Set aspect ratio to 1:1 for square cropping
+          viewMode: 1,    // Enable restricted view mode to prevent cropping outside the container
+          crop: function(event) {
+            // Update hidden input fields with crop data
+            document.getElementById('crop-x').value = event.detail.x;
+            document.getElementById('crop-y').value = event.detail.y;
+            document.getElementById('crop-width').value = event.detail.width;
+            document.getElementById('crop-height').value = event.detail.height;
+          }
+        });
+      }
+      reader.readAsDataURL(input.files[0]);
+    });
+  </script>
+{% endblock %}
