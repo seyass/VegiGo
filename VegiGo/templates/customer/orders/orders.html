@@ -1,0 +1,114 @@
+{% extends 'customer/base.html' %}
+{% load static %}
+{% block breadcrumb %}
+<div class="all-title-box">
+   <div class="container">
+       <div class="row">
+           <div class="col-lg-12">
+               <h2>My Account</h2>
+               <ul class="breadcrumb">
+                   <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Shop</a></li>
+                   <li class="breadcrumb-item"><a href="{% url 'user_profile' user.id %}">My account</a></li>
+                   <li class="breadcrumb-item active">Order</li>
+               </ul>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Order Details</h1>
+    <div id="orders-container">
+        {% for order in orders %}
+        <div class="order-item card mb-3 border-0" style="box-shadow: 5px 5px 10px #888888;">
+          <div class="card-header py-2" style="background-color: #7755A2; color: white;">
+            Order ID: {{ order.id }}
+          </div>
+          <div class="card-body py-2">
+            <div class="row">
+              <div class="col-md-6">
+                <h5 class=""><b>Order Date: </b>{{ order.created_at }}</h5>
+                <h5 class=""><b>Payment Method:</b>{{ order.payment_method }}</h5>
+              </div>
+              <div class="col-md-6">
+                <h5 class=""><b>Total Price: </b>{{ order.total_price }}</h5>
+                <h5 class=""><b>Payment Status: </b>{{ order.order_payment_status }}</h5>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-12">
+                <p class=""><b>Address:</b><br>
+                  <strong>Name:</strong> {{ order.address_info.firstname }} {{ order.address_info.lastname }}
+                  <strong>Phone:</strong> {{ order.address_info.phone_number }}<br>
+                  <strong>Address:</strong> {{ order.address_info.street_address }}, {{ order.address_info.city }}, {{ order.address_info.state }}, {{ order.address_info.pincode }}<br>
+                  <strong>Landmark:</strong> {{ order.address_info.landmark }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer py-2 text-muted" style="background-color: #06A245; display: flex; justify-content: space-between; align-items: center;">
+            <a href="{% url 'order_detail' order.id %}" class="btn hvr-hover">More Details</a>
+            {% if order.order_payment_status == 'pending' or order.order_payment_status == 'failed' %}
+            <a href="{% url 'failed_payment' order.id %}" class="btn hvr-hover">Pay now</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center" id="pagination">
+        <!-- Pagination items will be added here by JavaScript -->
+      </ul>
+    </nav>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rowsPerPage = 3;
+        const ordersContainer = document.getElementById('orders-container');
+        const pagination = document.getElementById('pagination');
+        const orderItems = ordersContainer.querySelectorAll('.order-item');
+        const totalPages = Math.ceil(orderItems.length / rowsPerPage);
+        let currentPage = 1;
+
+        function displayOrders(page) {
+            ordersContainer.innerHTML = '';
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const ordersArray = Array.from(orderItems);
+            const ordersToDisplay = ordersArray.slice(start, end);
+            ordersToDisplay.forEach(order => ordersContainer.appendChild(order));
+        }
+
+        function updatePagination() {
+            pagination.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.classList.add('page-item');
+                if (i === currentPage) li.classList.add('active');
+                const a = document.createElement('a');
+                a.classList.add('page-link');
+                a.style.backgroundColor = '#06A245';  // Change the button color
+                a.style.color = '#fff';  // Set the text color
+                a.textContent = i;
+                a.href = '#';
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentPage = i;
+                    displayOrders(currentPage);
+                    updatePagination();
+                });
+                li.appendChild(a);
+                pagination.appendChild(li);
+            }
+        }
+
+        displayOrders(currentPage);
+        updatePagination();
+    });
+</script>
+
+{% endblock %}

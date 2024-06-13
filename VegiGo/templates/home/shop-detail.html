@@ -1,0 +1,347 @@
+{% extends 'home/index.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .stars-outer {
+    position: relative;
+    display: inline-block;
+    font-size: 1.5rem;
+    color: #ccc; /* Empty star color */
+}
+
+.stars-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
+}
+
+.stars-inner::before {
+    content: "\2605\2605\2605\2605\2605"; /* Filled star Unicode */
+    color: #f8ce0b; /* Filled star color */
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+    .img-zoom-lens {
+        position: absolute;
+        border: 1px solid #d1ccc0;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-repeat: no-repeat;
+        cursor: none; /* Hide the default cursor */
+    }
+    .img-zoom-result {
+        border: 1px solid #d4d4d4;
+        width: 300px;
+        height: 300px;
+        display: none; /* Hide the zoom result initially */
+    }
+</style>
+
+<!-- Start All Title Box -->
+<div class="all-title-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Shop Detail</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'shop_page' %}">Shop</a></li>
+                    <li class="breadcrumb-item active">Shop Detail </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Title Box -->
+
+<!-- Start Shop Detail  -->
+<div class="shop-detail-box-main">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-5 col-lg-5 col-md-6">
+                <div class="row">
+                    <!-- Primary Image -->
+                    <div class="col-xl-12">
+                        <img src="{{ product.primary_image.url }}" alt="Primary Image" class="img-fluid primary-image" id="primary-image-zoom">
+                        <div class="img-zoom-result" id="myresult"></div>
+                    </div>
+
+                    <!-- Secondary Images -->
+                    <div class="col-md-6">
+                        <h3>Images</h3>
+                        <div class="col-sm-4">
+                            <img src="{{ product.primary_image.url }}" alt="Secondary Image" class="img-fluid thumbnail" data-zoom-image="{{ product.primary_image.url }}" data-image="{{ product.primary_image.url }}">
+                        </div>
+                        <div class="row">
+                            {% for secondary_image in product.secondaryimage_set.all %}
+                            <div class="col-sm-4">
+                                <img src="{{ secondary_image.image.url }}" alt="Secondary Image" class="img-fluid thumbnail" data-zoom-image="{{ secondary_image.image.url }}" data-image="{{ secondary_image.image.url }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-7 col-lg-7 col-md-6">
+                <div class="single-product-details">
+                    <h2>{{ product.name }}</h2>
+                    <h5>
+                        {% if product.max_discount %}
+                        <p style="color: green; font-size: 15px;"><b>{{ product.max_discount }}%</b></p>
+                        <del>₹{{ product.price }}</del> ₹{{ product.special_discount|floatformat:2 }}
+                        {% else %}
+                        ₹{{ product.special_discount|floatformat:2 }}
+                        {% endif %}
+                    </h5>
+                    
+                    {% if product.category_discount > 0 %}
+                    <p>Category offer: {{ product.category_discount }}% off</p>
+                    {% endif %}
+                    {% if product.product_discount > 0 %}
+                    <p>Product offer: {{ product.product_discount }}% off</p>
+                    {% endif %}
+                    
+                    <select id="location-dropdown" class="form-control">
+                        <option value="" selected disabled>Select Location</option>
+                        {% for product_location in product.productlocations_set.all %}
+                        <option value="{{ product_location.location.name }}" data-quantity="{{ product_location.quantity }}">{{ product_location.location.name }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <p id="quantity-display">Available quantity: {{ product.total_quantity }}</p>
+                    <p>unit: {{ product.unit_type }}</p>
+                    <h4>Short Description:</h4>
+                    <p>{{ product.description }}</p>
+                    
+                    <div class="price-box-bar">
+                        <div class="cart-and-bay-btn">
+                            {% if product.quantity == 0 %}
+                            <span class="out-of-stock">Out of Stock</span>
+                            {% else %}
+                            <a class="btn hvr-hover" data-fancybox-close="" href="#">Buy New</a>
+                        {% if customer %}
+                            {% if product in productItems %}
+                            <a href="{% url 'cart_page' %}" class="btn hvr-hover">Go to cart</a>
+                            {% else %}
+                            <a href="{% url 'add_to_cart' product.id %}" class="btn hvr-hover">Add to cart</a>
+                            {% endif %}
+
+                        {% else %}
+                            <a href="" class="hvr-hover">Add to cart</a>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+        
+                    <div class="add-to-btn">
+                        <div class="add-comp">
+                            <a class="btn hvr-hover" href="{% url 'add_wishlist' product.id %}"><i class="fas fa-heart"></i> Add to wishlist</a>
+                        </div>
+                        <div class="share-bar">
+                            <a class="btn hvr-hover" href="#"><i class="fab fa-facebook" aria-hidden="true"></i></a>
+                            <a class="btn hvr-hover" href="#"><i class="fab fa-google-plus" aria-hidden="true"></i></a>
+                            <a class="btn hvr-hover" href="#"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row my-5">
+            <div class="col-12 card-outline-secondary my-4">
+                <div class="card-header">
+                    <h2>Product Reviews</h2>
+                </div>
+                <div class="rating">
+                    <div class="stars-outer">
+                        <div class="stars-inner"></div>
+                    </div>
+                    <span class="rating-text">{{ rating|default:"No ratings yet" }}</span>
+                </div>
+                
+                <div class="card-body">
+                    {% for review in reviews %}
+                    <div class="media mb-3">
+                        <div class="mr-2">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="media-body">
+                            <p>{{ review.content }}</p>
+                            <small class="text-muted">Posted by {{ review.user.username }} on {{ review.created_at|date:"F j, Y" }}</small>
+                        </div>
+                    </div>
+                    <hr>
+                    {% empty %}
+                    <p>No reviews available.</p>
+                    {% endfor %}
+                    <a href="#" class="btn hvr-hover">Leave a Review</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row my-5">
+            <div class="col-lg-12">
+                <div class="title-all text-center">
+                    <h1>Featured Products</h1>
+                    <p>Here is the suggested products</p>
+                </div>
+                <div class="featured-products-box owl-carousel owl-theme">
+                    {% for product in featured_products %}
+                    <div class="item">
+                        <div class="products-single fix">
+                            <div class="box-img-hover">
+                                <img src="{{ product.primary_image.url }}" class="img-fluid" alt="{{ product.name }}">
+                                <div class="mask-icon">
+                                    <ul>
+                                        <li><a href="#" data-toggle="tooltip" data-placement="right" title="View"><i class="fas fa-eye"></i></a></li>
+                                        <li><a href="#" data-toggle="tooltip" data-placement="right" title="Compare"><i class="fas fa-sync-alt"></i></a></li>
+                                        <li><a href="#" data-toggle="tooltip" data-placement="right" title="Add to Wishlist"><i class="far fa-heart"></i></a></li>
+                                    </ul>
+                                    <a class="cart" href="#">Add to Cart</a>
+                                </div>
+                            </div>
+                            <div class="why-text">
+                                <h4>{{ product.name }}</h4>
+                                <h5> ₹{{ product.selling_price }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Cart -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+    // Get the average rating from the server-side (e.g., Django context)
+    var averageRating = parseFloat("{{ rating }}");
+
+    // Calculate the percentage width of the inner stars
+    var percentage = (averageRating / 5) * 100;
+    $('.stars-inner').css('width', percentage + '%');
+});
+
+</script>
+<script>
+    function imageZoom(imgID, resultID) {
+    var img, lens, result, cx, cy;
+    img = document.getElementById(imgID);
+    result = document.getElementById(resultID);
+
+    lens = document.createElement("DIV");
+    lens.setAttribute("class", "img-zoom-lens");
+
+    img.parentElement.insertBefore(lens, img);
+
+    cx = img.width / lens.offsetWidth;
+    cy = img.height / lens.offsetHeight;
+
+    lens.style.backgroundImage = "url('" + img.src + "')";
+    lens.style.backgroundSize = (img.width * cx) + "px " + (img.height * cy) + "px";
+
+    lens.addEventListener("mousemove", moveLens);
+    img.addEventListener("mousemove", moveLens);
+    lens.addEventListener("touchmove", moveLens);
+    img.addEventListener("touchmove", moveLens);
+
+    img.addEventListener("mouseleave", hideLens);
+    lens.addEventListener("mouseleave", hideLens);
+
+    function moveLens(e) {
+        lens.style.display = "block";  // Show the lens when moving
+        var pos, x, y;
+        e.preventDefault();
+        pos = getCursorPos(e);
+        x = pos.x - (lens.offsetWidth / 2);
+        y = pos.y - (lens.offsetHeight / 2);
+
+        if (x > img.width - lens.offsetWidth) { x = img.width - lens.offsetWidth; }
+        if (x < 0) { x = 0; }
+        if (y > img.height - lens.offsetHeight) { y = img.height - lens.offsetHeight; }
+        if (y < 0) { y = 0; }
+
+        lens.style.left = x + "px";
+        lens.style.top = y + "px";
+        lens.style.backgroundPosition = "-" + (x * cx) + "px -" + (y * cy) + "px";
+    }
+
+    function getCursorPos(e) {
+        var a, x = 0, y = 0;
+        e = e || window.event;
+        a = img.getBoundingClientRect();
+        x = e.pageX - a.left;
+        y = e.pageY - a.top;
+        x = x - window.pageXOffset;
+        y = y - window.pageYOffset;
+        return { x: x, y: y };
+    }
+
+    function hideLens() {
+        lens.style.display = "none";  // Hide the lens when the mouse leaves the image or the lens
+    }
+}
+
+function initializeZoom() {
+    const existingLens = document.querySelector('.img-zoom-lens');
+    if (existingLens) {
+        existingLens.remove();
+    }
+    imageZoom("primary-image-zoom", "myresult");
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeZoom();
+
+    var primaryImage = document.querySelector('.primary-image');
+    var thumbnails = document.querySelectorAll('.thumbnail');
+
+    thumbnails.forEach(function(thumbnail) {
+        thumbnail.addEventListener('click', function() {
+            primaryImage.src = this.src;
+            initializeZoom();
+        });
+    });
+});
+
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#location-dropdown').on('change', function() {
+            var selectedLocation = $(this).val();
+            if (selectedLocation) {
+                var locationQuantity = parseInt($('option:selected', this).data('quantity'));
+                if (!isNaN(locationQuantity)) {
+                    $('#quantity-display').text("Available quantity at " + selectedLocation + ": " + locationQuantity);
+                } else {
+                    $('#quantity-display').text("Available quantity at " + selectedLocation + ": Unknown");
+                }
+            } else {
+                $('#quantity-display').text("Please select a location");
+            }
+        });
+
+        
+    });
+</script>
+
+{% endblock %}
+
+
+

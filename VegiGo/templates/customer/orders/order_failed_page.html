@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order Failed</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+
+
+    <style>
+        /* File: styles.css */
+
+/* Failed animation styles */
+.animation-wrapper.failed .circle {
+    width: 80px;
+    height: 80px;
+    background-color: #7755A2;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.animation-wrapper.failed .crossmark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.animation-wrapper.failed .cross {
+    width: 60px;
+    height: 6px;
+    background-color: white;
+    position: absolute;
+    top: 37px;
+}
+
+.animation-wrapper.failed .cross:first-child {
+    transform: rotate(45deg);
+}
+
+.animation-wrapper.failed .cross:last-child {
+    transform: rotate(-45deg);
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="animation-wrapper failed">
+            <div class="circle">
+                <div class="crossmark">
+                    <div class="cross"></div>
+                    <div class="cross"></div>
+                </div>
+            </div>
+        </div>
+        <h2>Order Failed</h2>
+        <p>Sorry, something went wrong with your order. Please try again.</p>
+        <button class="button" onclick="retryOrder()">Try Again</button>
+    </div>
+
+    <script src="scripts.js"></script> <!-- Link to your JavaScript file -->
+</body>
+
+</html>

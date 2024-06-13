@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Edit Coupon</b></h2>
+   </div>
+     <div class="col-lg-3 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li class="breadcrumb-item"><a href="{% url 'coupon_page' %}"><b>Coupon</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Edit Coupon</b></li>
+     </ul>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="post" class="mt-3">
+                {% csrf_token %}
+                
+                <!-- Render each form field -->
+                <div class="row">
+                    <div class="col-10">
+                        {{ form.code.label_tag }}
+                        {{ form.code }}
+                        {% if form.code.errors %}
+                            <div class="text-danger">{{ form.code.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5">
+                        {{ form.discount_amount.label_tag }}
+                        {{ form.discount_amount }}
+                        {% if form.discount_amount.errors %}
+                            <div class="text-danger">{{ form.discount_amount.errors }}</div>
+                        {% endif %}
+                    </div>
+        
+                    <div class="col-5">
+                        {{ form.minimum_purchase.label_tag }}
+                        {{ form.minimum_purchase }}
+                        {% if form.minimum_purchase.errors %}
+                            <div class="text-danger">{{ form.minimum_purchase.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                
+                <div class="row">
+                    <div class="col-5">
+                        {{ form.start_date.label_tag }}
+                        {{ form.start_date }}
+                        {% if form.start_date.errors %}
+                            <div class="text-danger">{{ form.start_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-5">
+                        {{ form.end_date.label_tag }}
+                        {{ form.end_date }}
+                        {% if form.end_date.errors %}
+                            <div class="text-danger">{{ form.end_date.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                
+                
+                
+                <button style="border-radius: .375rem;" type="submit" class="btn hvr-hover mt-3">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

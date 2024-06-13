@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Report Preview</title>
+    <style>
+        .daily-sales-table {
+            width: 100%;
+            text-align: center;
+        }
+        .daily-sales-table th, .daily-sales-table td {
+            border: 1px solid #777;
+            padding: 8px;
+        }
+        .daily-sales-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .daily-sales-table tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+    
+</head>
+<body>
+    <div>
+        <!-- Display the report HTML passed from the view -->
+        {{ report|safe }}
+    </div>
+    
+    <form method="POST" action="{% url 'admin_report' %}">
+        {% csrf_token %}
+        <!-- Hidden input fields to pass the original form data -->
+        <input type="hidden" name="report_type" value="{{ request.POST.report_type }}">
+        <input type="hidden" name="custom_start_date" value="{{ request.POST.custom_start_date }}">
+        <input type="hidden" name="custom_end_date" value="{{ request.POST.custom_end_date }}">
+        
+        <!-- Download button -->
+        <button type="submit" name="download" value="true">Download PDF</button>
+    </form>
+</body>
+</html>

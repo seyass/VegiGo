@@ -1,0 +1,212 @@
+{% extends 'customer/base.html' %}
+
+{% block title %}
+  Address
+{% endblock %}
+
+{% block breadcrumb %}
+<div class="all-title-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>My Account</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
+                    <li class="breadcrumb-item active">{% if user.is_authenticated %}
+                        <a href="{% url 'user_profile' user.id %}"> My Account</a>
+                    {% elif customer %}
+                        <a href="{% url 'user_profile' customer.id %}"> My Account</a>
+                    {% endif %}</li>
+                    <li class="breadcrumb-item active">Address</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+    <div class="card text-center">
+        <div class="card-body">
+        <div class="card-header">
+          Manage Address
+        </div>
+        <div class="card-footer text-muted ml-5">
+            {% if userAddress %}
+            <div class="alert alert-info" role="alert">
+                {% for address in addresses %}
+                <div class="d-flex justify-content-between align-items-center" style="border: 1px solid #7755A2; text-align: left; margin-top: 5px;">
+                    <div class="col-8">
+                        <div class="col-2 mt-2" style="background-color: #06A245; color: white;">
+                            <b>{{ address.address_type }}</b>
+                        </div>
+                        <p>Name: <b>{{ address.firstname }} {{ address.lastname }}</b> | Phone: <b>{{ address.phone_number }}</b></p>
+                        <p>Full Address: {{ address.street_address }} </p>
+                        <p>{{ address.city }} {{ address.district }}  {{ address.pincode }}  ({{ address.landmark }})</p>
+                    </div>
+                    <div >
+                        
+                            <!-- Dropdown menu links -->
+                            <a class="btn hvr-hover" href="{% url 'edit_address' address.id %}?return_url=user_address"><i class="fa-regular fa-pen-to-square"></i></a>
+                            <!-- Button trigger modal -->
+                            <button type="button" style="background-color: red;" class="btn hvr-hover" data-toggle="modal" data-target="#exampleModalCenter">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            
+                            <!-- Modal -->
+                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                    <h1>Are you confirm to delete this address</h1>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <a class="btn hvr-hover" style="background-color: red; margin-right: 5px;" href="{% url 'delete_address' address.id %}">Confirm</a>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                There is no address
+              </div>
+              {% endif %}
+        </div>
+    </div>
+</div>
+        <h1>Add Address</h1>
+            <form method="POST" id="edit-address-form" class="custom-form">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="firstname" class="primary-color">First Name:</label>
+                        {{ form.firstname }}
+                        {% if form.firstname.errors %}
+                            <div class="text-danger">
+                                {% for error in form.firstname.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="lastname" class="primary-color">Last Name:</label>
+                        {{ form.lastname }}
+                        {% if form.lastname.errors %}
+                            <div class="text-danger">
+                                {% for error in form.lastname.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="phone_number" class="primary-color">Phone Number:</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="text-danger">
+                                {% for error in form.phone_number.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="street_address" class="primary-color">Street Address:</label>
+                        {{ form.street_address }}
+                        {% if form.street_address.errors %}
+                            <div class="text-danger">
+                                {% for error in form.street_address.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="city" class="primary-color">City:</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                            <div class="text-danger">
+                                {% for error in form.city.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="state" class="primary-color">District:</label>
+                        {{ form.district }}
+                        {% if form.district.errors %}
+                            <div class="text-danger">
+                                {% for error in form.district.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="landmark" class="primary-color">Landmark:</label>
+                        {{ form.landmark }}
+                        {% if form.landmark.errors %}
+                            <div class="text-danger">
+                                {% for error in form.landmark.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="pincode" class="primary-color">Pincode:</label>
+                        {{ form.pincode }}
+                        {% if form.pincode.errors %}
+                            <div class="text-danger">
+                                {% for error in form.pincode.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                    <div class="form-group">
+                        <label class="primary-color">Location:</label><br>
+                        {{ form.address_type }}
+                        {% if form.address_type.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.address_type.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                    </div>
+               
+                
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+    <!-- end side bar -->
+    {% endblock %}

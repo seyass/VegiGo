@@ -1,0 +1,58 @@
+/* Primary Color: #7755A2 */
+.primary-color {
+    color: #7755A2;
+}
+
+.primary-bg {
+    background-color: #7755A2;
+}
+
+/* Secondary Color: #06A245 */
+.secondary-color {
+    color: #06A245;
+}
+
+.secondary-bg {
+    background-color: #06A245;
+}
+
+/* Accent Colors: Black and White */
+.accent-black {
+    color: #000000;
+}
+
+.accent-white {
+    color: #ffffff;
+}
+
+/* Custom styles for the form */
+
+
+.custom-form .form-group label {
+    font-weight: bold;
+    color: #000000; /* Accent color: Black */
+}
+
+.custom-form .form-control {
+    border: 2px solid #000000; /* Accent color: Black */
+}
+
+.custom-form .form-control:focus {
+    border-color: #7755A2; /* Primary color: Purple */
+    box-shadow: 0 0 0 0.2rem rgba(119, 84, 162, 0.25); /* Primary color: Purple with some transparency */
+}
+
+.custom-form .form-check-input:checked + .form-check-label::before {
+    background-color: #06A245; /* Secondary color: Green */
+    border-color: #06A245; /* Secondary color: Green */
+}
+
+.custom-form .btn-primary {
+    background-color: #7755A2; /* Primary color: Purple */
+    border-color: #7755A2; /* Primary color: Purple */
+}
+
+.custom-form .btn-primary:hover {
+    background-color: #06A245; /* Secondary color: Green */
+    border-color: #06A245; /* Secondary color: Green */
+}

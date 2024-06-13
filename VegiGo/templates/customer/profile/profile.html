@@ -1,0 +1,163 @@
+{% extends 'home/index.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <!-- Start All Title Box -->
+    <div class="all-title-box">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>My Account</h2>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
+                        <li class="breadcrumb-item active">My account</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End All Title Box -->
+    <div style="justify-content: center;display:flex;">
+        <div class="card col-md-8">
+        <div class="card-header">
+          <b style="color: #7755A2; font-size: 36px;">My dashboard</b>
+        </div>
+        <div class="card-body">
+          <h4><b>Hello {{ customer.username }}, </b></h4>
+          <p>From your My Account Dashboard you have the ability to view a snapshot of your recent account activity and update your account information. Select a link below to view or edit information.</p>
+          <BR></BR>
+          <h4><b>ACCOUNT INFORMATION</b></h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <td scope="col">Contact  Information</td>
+                <td scope="col">Default Address</td>
+              </tr>
+             </thead>
+            <tbody>
+              <tr>
+                <td><p>{{customer.first_name}} {{customer.last_name}}</p>
+                    <p>{{ customer.username }},</p>
+                    <p>{{ customer.email }}</p>
+                    
+
+                </td>
+                <td >sivasialamadom</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Start My Account  -->
+    <div class="my-account-box-main">
+        <div class="container">
+            <div class="my-account-page">
+                <div class="row">
+                    <div class="col-lg-4 col-md-12">
+                        <div class="account-box">
+                            <div class="service-box">
+                                <div class="service-icon">
+                                    {% if user.is_authenticated %}
+                                    <a href="{% url 'orders_page' %}"> <i class="fa fa-gift"></i> </a>
+                                    {% elif customer %}
+                                        <!-- If user is not logged in, use customer.id -->
+                                        <a href="{% url 'orders_page' %}"> <i class="fa fa-gift"></i> </a>
+                                    {% else %}
+                                    <a href="#"> <i class="fa fa-gift"></i> </a>
+                                    {% endif %}
+                                    
+                                </div>
+                                <div class="service-desc">
+                                    <h4>Your Orders</h4>
+                                    <p>Track, return, or buy things again</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="account-box">
+                            <div class="service-box">
+                                <div class="service-icon">
+                                    {% if user.is_authenticated %}
+                                        <a href="{% url 'edit_profile' user.id %}"><i class="fa fa-lock"></i></a>
+                                    {% elif customer %}
+                                        <!-- If user is not logged in, use customer.id -->
+                                        <a href="{% url 'edit_profile' customer.id %}"><i class="fa fa-lock"></i></a>
+                                    {% else %}
+                                        <a href=""><i class="fa fa-user s_color"></i> My Account</a>
+                                    {% endif %}
+                                </div>
+                                <div class="service-desc">
+                                    <h4>User profile</h4>
+                                    <p>Edit login, name, and gmail</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="account-box">
+                            <div class="service-box">
+                                <div class="service-icon">
+                                    {% if user.is_authenticated %}
+                                        <a href="{% url 'address_page' user.id %}"> <i class="fa fa-location-arrow"></i></a>
+                                    {% elif customer %}
+                                        <a href="{% url 'address_page' customer.id %}"> <i class="fa fa-location-arrow"></i></a>
+                                    {% endif %}</li>
+                                </div>
+                                <div class="service-desc">
+                                    <h4>Your Addresses</h4>
+                                    <p>Edit addresses for orders and gifts</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="account-box">
+                            <div class="service-box">
+                                <div class="service-icon">
+                                    <a href="{% url 'wallet_page' %}"> <i class="fa fa-credit-card"></i> </a>
+                                </div>
+                                <div class="service-desc">
+                                    <h4>Wallet</h4>
+                                    <p>See your wallet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="account-box">
+                            <div class="service-box">
+                                <div class="service-icon">
+                                    <a href="{% url 'cart_page' %}"> <i class="fa fa-credit-card"></i> </a>
+                                </div>
+                                <div class="service-desc">
+                                    <h4>Cart</h4>
+                                    <p>Go to cart</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-12">
+                        <div class="account-box">
+                            <div class="service-box">
+                                <div class="service-icon">
+                                    <a href="{% url 'wishlist_page' %}"> <i class="fa fa-credit-card"></i> </a>
+                                </div>
+                                <div class="service-desc">
+                                    <h4>Wishlist</h4>
+                                    <p>See your wishlist</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End My Account -->
+{% endblock %}

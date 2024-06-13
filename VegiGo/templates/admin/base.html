@@ -1,0 +1,157 @@
+<!-- base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin Panel{% endblock %}</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}" >
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="{% static 'css/admin.css' %}" > -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pFKfoA2zYal0qBPe03OYu+VGpYrAaGNu8IAG+n1zpKX3NfH6IM7UoEmzD0EIMqMl" crossorigin="anonymous"></script>
+  
+  <script src="https://kit.fontawesome.com/51e5ffc4ad.js" crossorigin="anonymous"></script>
+  
+  <style>
+    
+  </style>
+</head>
+
+
+<body>
+<div class="container-fluid" style="background-color: #edf2f9;">
+  <div style=" background-color: #7755A2 ;" class="row d-flex justify-content-center mt-4 mb-4" >
+    <b><h1 style="color: white;" class="mt-2">Admin Panel</h1></b>
+  </div>
+  {% block breadcrumb %}
+       <div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+           <div class="col-lg-8 mt-5">
+            <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Admin</b></h2>
+          </div>
+            <div class="col-sm-1 mt-4">
+              <ul class="breadcrumb" style="background-color: #06A245;">
+                
+                <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Admin</b></li>
+            </ul>
+           </div>
+       </div>
+{% endblock %}
+  <div class="row">
+    <div class="col-2 ml-2"  style="background-image: linear-gradient(195deg, #42424a 0%, #191919 100%); border-radius: .375rem;">
+      <nav class="nav flex-column" >
+        
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link mt-3 btn hvr-hover" href="{% url 'dashboard' %}">
+          <i class="fa-solid fa-table-columns"></i>
+          Dashboard
+        </a>
+  
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'admin_report' %}" {% if request.path == '/admin_report/' %}class="active"{% endif %}>
+          <i class="fa-regular fa-file-pdf"></i>
+            Reports</a>
+  
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'customers' %}" {% if request.path == '/customers/' %}class="active"{% endif %}>
+          <i class="fa-solid fa-users"></i>
+          Customers
+        </a>
+  
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'branches_page' %}" {% if request.path == '/branches_page/' %}class="active"{% endif %}>
+          <i class="fa-solid fa-code-branch"></i>
+          Branches
+        </a>
+  
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'products' %}" {% if request.path == '/products/' %}class="active"{% endif %}>
+          <i class="fa-brands fa-product-hunt"></i>
+          Products
+        </a>
+     
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'categories' %}" {% if request.path == '/categories/' %}class="active"{% endif %}>
+          <i class="fa-solid fa-layer-group"></i>
+          Categories
+        </a>
+      
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'offer_page' %}" {% if request.path == '/offer_page/' %}class="active"{% endif %}>
+          <i class="fa-solid fa-percent"></i>
+          Offer
+        </a>
+     
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'admin_orders' %}" {% if request.path == '/admin_orders/' %}class="active"{% endif %}>
+          <i class="fa-solid fa-book"></i> Orders
+        </a>
+     
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'coupon_page' %}" {% if request.path == '/offer_page/' %}class="active"{% endif %}>
+          <i class="fa-solid fa-money-bill"></i>
+          Coupon
+        </a>
+      
+        <a style="width: 100%; border-radius: .375rem;" class="nav-link btn hvr-hover mt-2" href="{% url 'logout_page' %}" {% if request.path == '/logout/' %}class="active"{% endif %}>
+          <i class="fa-solid fa-power-off"></i>
+          Logout
+        </a>
+  </nav>
+  <!-- Sidebar -->
+    </div>
+    <div class="col-9">
+      {% block content %}
+    {% endblock %}
+    </div>
+  </div>
+  </div>
+  
+
+
+
+
+
+
+
+<div style=" overflow-x: hidden;" class="container mt-4 content"> <!-- Apply content class to container -->
+  
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
+<script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<!-- ALL PLUGINS -->
+<script src="{% static 'js/jquery.superslides.min.js' %}"></script>
+<script src="{% static 'js/bootstrap-select.js' %}"></script>
+<script src="{% static 'js/inewsticker.js' %}"></script>
+<script src="{% static 'js/bootsnav.js' %}"></script>
+<script src="{% static 'js/images-loded.min.js' %}"></script>
+<script src="{% static 'js/isotope.min.js' %}"></script>
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/baguetteBox.min.js' %}"></script>
+<script src="{% static 'js/form-validator.min.js' %}"></script>
+<script src="{% static 'js/contact-form-script.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<script>
+  function toggleSidebar() {
+    var sidebar = document.querySelector('.sidebar');
+    var sidebarToggle = document.querySelector('.sidebar-toggle');
+    if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+        sidebar.style.display = 'block';
+        sidebarToggle.classList.add('active');
+    } else {
+        sidebar.style.display = 'none';
+        sidebarToggle.classList.remove('active');
+    }
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+

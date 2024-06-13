@@ -1,0 +1,90 @@
+{% extends 'admin/base.html' %}
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Add Offer</b></h2>
+   </div>
+     <div class="col-lg-3 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li class="breadcrumb-item"><a href="{% url 'offer_page' %}"><b>Offer</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Add offer</b></li>
+     </ul>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    
+                        {% if form.product.label_tag %}
+                        <div class="form-group col-md-5">
+                            {{ form.product.label_tag }}
+                            {{ form.product }}
+                            {% for error in form.product.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="form-group col-md-5">
+                            {{ form.category.label_tag }}
+                            {{ form.category }}
+                            {% for error in form.category.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                        </div>
+                        {% endif %}
+                    
+                    
+                    <div class="form-group col-md-5">
+                        {{ form.discount.label_tag }}
+                        {{ form.discount }}
+                        {% for error in form.discount.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-10">
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                        {% for error in form.description.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-5">
+                        {{ form.start_date.label_tag }}
+                        {{ form.start_date }}
+                        {% for error in form.start_date.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group col-md-5">
+                        {{ form.end_date.label_tag }}
+                        {{ form.end_date }}
+                        {% for error in form.end_date.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="col-12">
+                    <button style="border-radius: .375rem;" type="submit" class="btn hvr-hover">Save Changes</button>
+                </div>
+            </form>
+            
+
+
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,107 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order Success</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+
+    <style>
+        /* File: styles.css */
+
+/* Common styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Success animation styles */
+.animation-wrapper.success .circle {
+    width: 80px;
+    height: 80px;
+    background-color: #06A245;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.animation-wrapper.success .checkmark {
+    width: 40px;
+    height: 80px;
+    position: absolute;
+    top: 20%;
+    left: 25%;
+    transform: rotate(45deg);
+    border-bottom: 6px solid white;
+    border-right: 6px solid white;
+    animation: drawCheckmark 0.5s ease-in-out forwards;
+}
+
+@keyframes drawCheckmark {
+    0% {
+        width: 0;
+        height: 0;
+    }
+    100% {
+        width: 40px;
+        height: 80px;
+    }
+}
+
+/* Button styles */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #7755A2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #5d4390;
+}
+
+    </style>
+
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="animation-wrapper success">
+            <div class="circle">
+                <div class="checkmark"></div>
+            </div>
+        </div>
+        <h2>Order Successful!</h2>
+        <p>Thank you for your purchase. Your order has been placed successfully.</p>
+        <p>Order ID: <span id="orderId">123456</span></p>
+        <p>You will receive an email confirmation shortly.</p>
+        <button class="button" onclick="continueShopping()"><a style="color: #06A245;" href="{% url 'home_page' %}" class="hover hvr-hover">Continue shoping</a></button>
+    </div>
+
+    <script src="scripts.js"></script> <!-- Link to your JavaScript file -->
+</body>
+
+</html>

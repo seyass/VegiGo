@@ -1,0 +1,73 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    Branches
+{% endblock %}
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Branch</b></h2>
+   </div>
+     <div class="col-lg-2 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Branches</b></li>
+     </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-9">
+      <table class="table">
+        <thead style="background-color: #7755A2; color: white;">
+          <tr>
+            <th scope="col">Place</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+            {% for branch in branches %}
+                <tr class="table-success">
+                <td>{{ branch.name }}</td>
+                
+                    <td>
+                        <a href="{% url 'edit_branch' branch.id %}" class="btn hvr-hover"><i class="fa-regular fa-pen-to-square"></i></a>
+                        <a style="background-color: red;" href="{% url 'delete_branch' branch.id %}" class="btn hvr-hover"><i class="fa-solid fa-trash"></i></a>
+                      </td>
+                    </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-3">
+      <form method="post" action="">
+        {% csrf_token %}
+        <!-- Render the form with Bootstrap classes -->
+        <div class="form-group">
+            {{ form.name.label_tag }}
+            {{ form.name }}
+            {% if form.errors.name %}
+            <p class="text-danger">{{ form.errors.name }}</p>
+            {% endif %}
+        </div>
+          <!-- Add a submit button -->
+    <div class="form-group">
+        <button type="submit" class="hvr-hover">Add Branch</button>
+    </div>
+</form>
+    </div>
+  </div>
+  
+  </div>
+
+{% endblock %}
+
+
+

@@ -1,0 +1,117 @@
+{% extends 'admin/base.html' %}
+{% block breadcrumb %}
+       <div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+           <div class="col-lg-8 mt-5">
+            <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Edit Product</b></h2>
+          </div>
+            <div class="col-lg-3 mt-4">
+              <ul class="breadcrumb" style="background-color: #06A245;">
+                <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products' %}"><b>Product</b></a></li>
+                <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Edit product</b></li>
+            </ul>
+           </div>
+       </div>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Form for editing a product and product locations -->
+            <form method="POST" enctype="multipart/form-data" id="product-form">
+                {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ productForm.name.label_tag }} {{ productForm.name }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ productForm.category.label_tag }} {{ productForm.category }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ productForm.description.label_tag }} {{ productForm.description }}
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ productForm.price.label_tag }} {{ productForm.price }}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ productForm.selling_price.label_tag }} {{ productForm.selling_price }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ productForm.primary_image.label_tag }} {{ productForm.primary_image }}
+                
+            </div>
+            <div class="form-group">
+                {{ productForm.unit_type.label_tag }} {{ productForm.unit_type }}
+            </div>
+            <div class="form-group">
+                <label for="secondary_images">Secondary Images</label>
+                <input type="file" name="secondary_images" multiple>
+            </div>
+                
+                <!-- Render location checkboxes and corresponding quantity inputs -->
+                <div class="form-group">
+                    <label for="locations">Select Locations and Enter Quantities:</label>
+                    {% for location in locations %}
+                        <div class="form-check mb-2">
+                            <!-- Checkbox for the location -->
+                            <input type="checkbox" name="locations" value="{{ location.id }}" class="form-check-input" id="location-{{ location.id }}" {% if location.id in product_locations %}checked{% endif %}>
+                            <label for="location-{{ location.id }}" class="form-check-label">{{ location.name }}</label>
+
+                            <!-- Quantity input for the location -->
+                            <div class="quantity-input-container">
+                                <input type="number" name="quantity_{{ location.id }}" class="form-control" placeholder="Quantity" value="{{ product_quantities|get_item:location.id }}" {% if location.id not in product_locations %}disabled{% endif %}>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Submit button -->
+                <button style="border-radius: .375rem;" type="submit" class="btn hvr-hover">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Inside the form -->
+<div class="form-group">
+    <label for="secondary_images">Secondary Images</label>
+    {% for secondary_image in secondary_images %}
+        <div>
+            <img src="{{ secondary_image.image.url }}" alt="Secondary Image" style=" width: 100px;">
+            <form action="{% url 'delete_secondary_image' product.id secondary_image.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+// JavaScript to enable or disable quantity inputs based on the
+// selection of location checkboxes
+document.addEventListener('DOMContentLoaded', function() {
+const form = document.getElementById('product-form');
+const checkboxes = document.querySelectorAll('input[type="checkbox"][name="locations"]');
+const quantityInputs = document.querySelectorAll('.quantity-input-container input[type="number"]');
+
+
+// Add event listener to checkboxes
+checkboxes.forEach(checkbox => {
+    const quantityInput = form.querySelector(`input[name="quantity_${checkbox.value}"]`);
+
+    checkbox.addEventListener('change', function() {
+        quantityInput.disabled = !this.checked;
+        if (!this.checked) {
+            quantityInput.value = ''; // Reset quantity input when checkbox is unchecked
+        }
+    });
+
+    // Initialize the state of the quantity input based on whether the checkbox is checked
+    quantityInput.disabled = !checkbox.checked;
+});
+});
+</script>
+
+{% endblock %}

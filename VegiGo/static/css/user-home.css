@@ -1,0 +1,40 @@
+.table {
+    
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    border-radius: 30px; /* Adjust as needed */
+    background-color: #2c2c2c; /* Dark mode background color */
+    width: 80%; /* Adjust the width as needed */
+     /* Add border with color */
+}
+
+.button-cell {
+    font-weight: 700;
+    font-size: 16px; /* Adjust as needed */
+    text-align: center;
+    cursor: pointer;
+    border-radius: 30px; /* Adjust as needed */
+    transition: background-color 0.3s;
+}
+
+.button-cell:hover {
+    background-color: #06A245; /* Hover color */
+}
+
+.button-cell a {
+    display: block;
+    padding: 10px;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.button-cell a:hover {
+    background-color: #06A245; /* Hover color */
+}
+
+.button-cell.selected {
+    background-color: #7755A2;
+}
+
+

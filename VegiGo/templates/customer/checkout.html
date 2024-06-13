@@ -1,0 +1,257 @@
+{% extends 'home/index.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Start All Title Box -->
+<div class="all-title-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Checkout</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'cart_page' %}">Cart</a></li>
+                    <li class="breadcrumb-item active">Checkout</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Title Box -->
+
+<!-- Start Cart  -->
+{% if cartId %}
+<div class="cart-box-main">
+    <form action="{% url 'place_order' %}" method="POST">
+        {% csrf_token %}
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-lg-6 mb-3">
+                    <h1>Address & payment</h1>
+                    <hr class="mb-4">
+                    {% if cartId %}
+                    <a href="{% url 'address_page' customer.id %}?return_url=checkout_page"><h3>Add address</h3></a>
+                    {% endif %}
+                    {% for address in addresses %}
+                    <div class="">
+                        <input id="address" name="address" type="radio" class="" value="{{ address.id }}" checked required>
+                        <label style="width: 25%;" for="address"></label>
+                        <div class="col-6 mt-2" style="background-color: #06A245; color: white;">
+                            <b>{{ address.address_type }}</b>
+                        </div>
+                        <p>Name: <b>{{ address.firstname }} {{ address.lastname }}</b> | Phone: <b>{{ address.phone_number }}</b></p>
+                        <p>Full Address: {{ address.street_address }}</p>
+                        <p>{{ address.city }} {{ address.state }} {{ address.pincode }} ({{ address.landmark }})</p>
+                        </label>
+                    </div>
+                    <hr class="mb-1">
+                    {% endfor %}
+                    <div class="title">
+                        <span>Payment</span>
+                    </div>
+                    <div class="d-block my-3">
+                        <div class="d-block my-3">
+                            <div class="custom-control custom-radio">
+                                <input id="cod" name="paymentMethod" type="radio" class="custom-control-input" value="Cod" checked required>
+                                <label class="custom-control-label" for="cod">Cash on delivery</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input id="razorpay" name="paymentMethod" type="radio" class="custom-control-input" value="Razorpay" required>
+                                <label class="custom-control-label" for="razorpay">Razorpay</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input id="wallet" name="paymentMethod" type="radio" class="custom-control-input" value="Wallet" required>
+                                <label class="custom-control-label" for="wallet">Wallet</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-6 mb-3">
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12">
+                            <div class="odr-box">
+                                <div class="title-left">
+                                    <h3>Shopping cart</h3>
+                                </div>
+                                <div class="rounded p-2 bg-light">
+                                    {% for item in items %}
+                                    <div class="media mb-2 border-bottom">
+                                        <div class="media-body">
+                                            <a href="#">{{ item.product.name }}</a>
+                                            <div class="small text-muted">Price: {{ item.product.price }} &#8377;<span class="mx-2">|</span> Qty: {{ item.quantity }} <span class="mx-2">|</span> Subtotal: {{ item.total_price }} &#8377;</div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12">
+                            <div class="order-box">
+                                <div class="row my-5 ml-auto">
+                                    <div class="col-lg-8">
+                                        <div class="coupon-box">
+                                            <div class="input-group input-group-sm">
+                                                <input class="form-control" placeholder="Enter your coupon code" id="coupon-code" aria-label="Coupon code" type="text">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-theme" id="apply-coupon-btn" data-apply-coupon-url="{% url 'apply_coupon' %}">Apply Coupon</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="title-left">
+                                            <h3>Available couopns</h3>
+                                        </div>
+                                        {% for coupon in coupons %}
+
+                                        <div class="small text-muted">Code: {{ coupon.code }} ;<span class="mx-2">|</span> Minimum purchase: {{ coupon.minimum_purchase }} &#8377;</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="title-left">
+                                    <h3>Your order</h3>
+                                </div>
+                                <div class="d-flex">
+                                    <div class="font-weight-bold">Product</div>
+                                    <div class="ml-auto font-weight-bold">Total</div>
+                                </div>
+                                <hr class="my-1">
+                                {% for item in items %}
+                                <div class="d-flex">
+                                    <h4>{{ item.product.name }}</h4>
+                                    <div class="ml-auto font-weight-bold">{{ item.total_price|floatformat:2 }}</div>
+                                </div>
+                                {% endfor %}
+                                <hr class="my-1">
+                                <div class="d-flex">
+                                    <h4>Sub Total</h4>
+                                    <div class="ml-auto font-weight-bold">{{ total_price|floatformat:2 }} &#8377;</div>
+                                </div>
+                                <div class="d-flex">
+                                    <h4>Discount</h4>
+                                    <div class="ml-auto font-weight-bold">{{ total_discount|floatformat:2 }} &#8377;</div>
+                                </div>
+                                {% if cart.select_coupon %}
+                                <div class="d-flex">
+                                    <h4>Coupon Discount</h4>
+                                    <div class="ml-auto font-weight-bold">{{ cart.select_coupon.discount|floatformat:2 }} &#8377;</div>
+                                </div>
+                                <div class="d-flex">
+                                    <h4>{{ cart.select_coupon.code }}</h4>
+                                    <div class="ml-auto font-weight-bold"><a class="btn hvr-hover" href="{% url 'remove_coupon' %}">cancel the coupon</a></div>
+                                </div>
+                                {% endif %}
+                                <div class="d-flex">
+                                    <h4>Delivery charge</h4>
+                                    <div class="ml-auto font-weight-bold">Free</div>
+                                </div>
+                                <hr>
+                                <div class="d-flex gr-total">
+                                    <h5>Grand Total</h5>
+                                    <div class="ml-auto h5">{{ cart.sub_total|floatformat:2 }} &#8377;</div>
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 d-flex shopping-box">
+                        <button class="btn hvr-hover place-order-btn" type="submit" disabled>Place order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="" id="cart-id-ch" value="{{ cartId }}" disabled>
+    </form>
+</div>
+{% else %}
+<h1>Nothing in the checkout page</h1>
+<!-- End Cart -->
+{% endif %}
+{% endblock %}
+
+{% block javascript %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    $(document).ready(function() {
+        // Function to check if any address is selected
+        function isAddressSelected() {
+            return $('input[name="address"]:checked').length > 0;
+        }
+        
+        // Function to check if the COD option is selected and sub_total is greater than 1000
+        function isCodNotAllowed() {
+            var subTotal = parseFloat('{{ cart.sub_total }}');
+            var paymentMethod = $('input[name="paymentMethod"]:checked').val();
+            return subTotal > 1000 && paymentMethod === 'Cod';
+        }
+        
+        // Function to enable or disable the "Place order" button based on address selection and COD condition
+        function togglePlaceOrderButton() {
+            if (isAddressSelected()) {
+                if (isCodNotAllowed()) {
+                    $('.place-order-btn').prop('disabled', true).text('COD not available for orders over 1000 &#8377;');
+                } else {
+                    $('.place-order-btn').prop('disabled', false).text('Place order');
+                }
+            } else {
+                $('.place-order-btn').prop('disabled', true).text('Place order');
+            }
+        }
+        
+        // Initially check the address selection and COD condition when the page loads
+        togglePlaceOrderButton();
+        
+        // Check the address selection when any address radio button is clicked
+        $('input[name="address"]').on('change', function() {
+            togglePlaceOrderButton();
+        });
+        
+        // Check the COD condition when any payment method radio button is clicked
+        $('input[name="paymentMethod"]').on('change', function() {
+            togglePlaceOrderButton();
+        });
+
+        $('#apply-coupon-btn').click(function(event) {
+            event.preventDefault(); // Prevent the default action of the button
+            
+            var couponCode = $('#coupon-code').val();
+            var applyCouponUrl = $(this).data('apply-coupon-url'); // Get the URL from the data attribute
+            var csrfToken = $('[name=csrfmiddlewaretoken]').val(); // Assuming CSRF token is included in a meta tag
+            var cartId = $('#cart-id-ch').val(); 
+            // Send an AJAX request to apply the coupon
+            $.ajax({
+                type: 'POST',
+                url: applyCouponUrl, // Use the manually provided URL
+                headers: {
+                    "X-CSRFToken": csrfToken // Include CSRF token in the request header
+                },
+                data: {
+                    'coupon_code': couponCode,
+                    'csrfmiddlewaretoken': csrfToken // Include CSRF token in the request data
+                },
+                success: function(response) {
+                    if (response.success) {
+                        window.location.href = `/checkout_page/${cartId}/`
+                    } else if (response.error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.error
+                        });
+                    }
+                },
+                error: function(xhr, errmsg, err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to apply coupon. Please try again later.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+
+

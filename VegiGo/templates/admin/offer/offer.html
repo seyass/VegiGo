@@ -1,0 +1,90 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block title %}  Offer management  {% endblock %}
+
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Offer</b></h2>
+   </div>
+     <div class="col-lg-2 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Offer</b></li>
+     </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="container mt-3">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <tr>
+                    <a href="{% url 'add_category_offer' %}" class="btn hvr-hover">Add offer for category</a>
+                </tr>
+                <table class="table">
+                    <thead style="background-color: #7744a2; color: white;">
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col">Discount</th>
+                            <th scope="col">Start Date</th>
+                            <th scope="col">End Date</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for offer in categoryOffers %}
+                        <tr class="table-success">
+                            <td>{{ offer.category.name }}</td>
+                            <td>{{ offer.discount }}%</td>
+                            <td>{{ offer.start_date }}</td>
+                            <td>{{ offer.end_date }}</td>
+                            <td>
+                                <a href="{% url 'edit_category_offer' offer.id %}" class="btn hvr-hover"><i class="fa-regular fa-pen-to-square"></i></a>
+                                <a style="background-color: red;" href="{% url 'delete_category_offer' offer.id %}" class="btn hvr-hover"><i class="fa-solid fa-trash"></i></a>
+                              </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-6">
+                <tr>
+                    <a href="{% url 'add_product_offer' %}" class="btn hvr-hover">Add offer for product</a>
+                </tr>
+                <table class="table">
+                    <thead style="background-color: #7744a2; color: white;">
+                        
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Discount</th>
+                            <th scope="col">Start Date</th>
+                            <th scope="col">End Date</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offer in productOffers %}
+                        <tr class="table-success">
+                            <td>{{ offer.product.name }}</td>
+                            <td>{{ offer.discount }}%</td>
+                            <td>{{ offer.start_date }}</td>
+                            <td>{{ offer.end_date }}</td>
+                            <td>
+                                <a href="{% url 'edit_product_offer' offer.id %}" class="btn hvr-hover"><i class="fa-regular fa-pen-to-square"></i></a>
+                                <a style="background-color: red;" href="{% url 'delete_product_offer' offer.id %}" class="btn hvr-hover"><i class="fa-solid fa-trash"></i></a>
+                              </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

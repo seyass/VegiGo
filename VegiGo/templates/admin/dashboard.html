@@ -1,0 +1,243 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Sales Reports - 2024{% endblock %}
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Dashboard</b></h2>
+   </div>
+     <div class="col-lg-3 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Dashboard</b></li>
+     </ul>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+<style>
+  body {
+    background-color: rgb(37, 34, 37);
+  }
+  .header {
+    background-color: #7755A2;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .card {
+    background-color: #c2a7e5;
+    color: black;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .card h2 {
+    color: black;
+    margin-bottom: 15px;
+  }
+  .list-group {
+    list-style: none;
+    padding: 0;
+  }
+  .list-group-item {
+    background-color: #7755A2;
+    color: white;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  .list-group-item:last-child {
+    border-bottom: none;
+  }
+  .serial-number {
+    width: 30px;
+    display: inline-block;
+    text-align: center;
+    margin-right: 10px;
+    color: #06A245;
+  }
+  .float-end {
+    float: right;
+  }
+  .chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+  }
+</style>
+
+<div class="header">
+  <h1>Sales Reports - 2024</h1>
+</div>
+
+<div class="container mt-4">
+  <h1>Dashboard</h1>
+  <div class="form-group">
+    <label for="timeframe">Select Timeframe:</label>
+    <select id="timeframe" class="form-control">
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+  </div>
+  <div class="row">
+    <div class="col-md-6 chart-container">
+      <canvas id="ordersChart"></canvas>
+    </div>
+    <div class="col-md-6 chart-container">
+      <canvas id="revenueChart"></canvas>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <h2>Best Selling Products</h2>
+      <ul class="list-group">
+        {% for product in best_selling_product %}
+          <li class="list-group-item">
+            <span class="serial-number">{{ forloop.counter }}</span>
+            <span>{{ product.product__product }}</span>
+            <span class="float-end">{{ product.total_quantity }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <h2>Top 10 Categories</h2>
+      <ul class="list-group">
+        {% for category in category_sales %}
+          <li class="list-group-item">
+            <span class="serial-number">{{ forloop.counter }}</span>
+            <span>{{ category.product__category }}</span>
+            <span class="float-end">{{ category.total_quantity }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const timeframeSelect = document.getElementById('timeframe');
+
+    timeframeSelect.addEventListener('change', updateCharts);
+
+    function updateCharts() {
+      const timeframe = timeframeSelect.value;
+
+      fetch(`/dashboard/data/?timeframe=${timeframe}`)
+        .then(response => response.json())
+        .then(data => {
+          updateChart(ordersChart, data.orders_data, 'Total Orders');
+          updateChart(revenueChart, data.revenue_data, 'Total Revenue');
+        });
+    }
+
+    function updateChart(chart, data, label) {
+      chart.data.labels = data.map(item => item.date);
+      chart.data.datasets[0].data = data.map(item => item.total);
+      chart.data.datasets[0].label = label;
+      chart.update();
+    }
+
+    const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+
+    const ordersChart = new Chart(ordersCtx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Total Orders',
+          data: [],
+          borderColor: '#06A245',
+          backgroundColor: '#06A245',
+          borderWidth: 2,
+          barThickness: 60,
+          hoverBackgroundColor: 'rgba(6, 162, 69, 0.8)'
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            ticks: {
+              color: 'black',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          },
+          y: {
+            ticks: {
+              color: 'black',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          }
+        }
+      }
+    });
+
+    const revenueChart = new Chart(revenueCtx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Total Revenue',
+          data: [],
+          borderColor: '#7755A2',
+          backgroundColor: '#7755A2',
+          borderWidth: 2,
+          barThickness: 60,
+          hoverBackgroundColor: 'rgba(119, 85, 162, 0.8)'
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            ticks: {
+              color: 'black',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          },
+          y: {
+            ticks: {
+              color: 'black',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            }
+          }
+        }
+      }
+    });
+
+    updateCharts();
+  });
+</script>
+{% endblock %}

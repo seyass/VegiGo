@@ -1,0 +1,278 @@
+{% extends 'customer/base.html' %}
+
+{% load static %}
+
+{% block breadcrumb %}
+<div class="all-title-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>My Account</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Shop</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'home_page' %}">My Account</a></li>
+                    <li class="breadcrumb-item active">Cart</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Start Cart  -->
+<div class="cart-box-main">
+        <div class="container">
+            <form id="branch-select-form" method="POST" action="{% url 'update_cart_location' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="branch-select">Select Branch:</label>
+                    <select name="branch_id" id="branch-select" class="form-control">
+                        <option value="{{ cart.location.id }}" >{{ cart.location.name }}</option>
+                        {% for branch in branches %}
+                        <option value="{{ branch.id }}">{{ branch.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="cart_id" value="{{ cart.id }}">
+                    <button type="submit" style="display: none;">Submit</button> <!-- Hidden submit button -->
+                </div>
+            </form>
+            
+            <div class="cart-box-main">
+                <div class="container">
+                    
+                        
+                        <input type="hidden" name="cart_id" value="{{ cart.id }}">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="table-main table-responsive">
+                                    <table class="table" style="background-color: white;">
+                                        <thead>
+                                            <tr>
+                                                <th>Images</th>
+                                                <th>Product Name</th>
+                                                <th>Price</th>
+                                                <th>Quantity</th>
+                                                <th>Unit</th>
+                                                <th>Total</th>
+                                                <th>Remove</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if items %}
+                                                {% for item in items %}
+                                            <tr>
+                                                <td class="thumbnail-img">
+                                                    <a href="#">
+                                                        <img class="img-fluid" src="{{ item.product.primary_image.url }}" alt="{{ item.product.name }}" />
+                                                    </a>
+                                                </td>
+                                                <td class="name-pr">
+                                                    <a href="#">{{ item.product.name }}</a>
+                                                </td>
+                                                <td class="price-pr">{{item.product.special_discount}} </td>
+                                                <td>
+                                                    {% if item.max_quantity > 0 %}
+                                                    <button class="plus-button"><i class="fa-solid fa-plus"></i></button>
+                                                        <input style="width: 45px; text-align: center;" 
+                                                            type="text" 
+                                                            name="quantity_{{ item.product.id }}" 
+                                                            id="quantity_{{ item.product.id }}" 
+                                                            data-cart-id="{{ cart.id }}" 
+                                                            min="1" 
+                                                            max="{{ item.max_quantity }}" 
+                                                            value="{{ item.quantity }}"
+                                                        >
+                                                        <button class="minus-button"><i class="fa-solid fa-minus"></i></button>
+                                                    {% elif item.max_quantity == 0 %}
+                                                        <span>Out of Stock</span>
+                                                    {% endif %}
+                                                    <span id="quantity-error_{{ item.product.id }}" style="color: red;"></span>
+                                                </td>
+                                                <td>{{ item.product.unit_type }}</td>
+                                                <td class="total-pr">
+                                                    <p>{{ item.total_price|floatformat:2 }}</p>
+                                                </td>
+                                                <td class="remove-pr">
+                                                    <a href="{% url 'remove_cart_item' item.id %}"><i class="fas fa-times"></i></a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% else %}
+                                            <tr>
+                                                <td colspan="6">
+                                                    <h1>There are no cart items</h1>
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        
+                    
+                    <!-- Other cart content -->
+                </div>
+            </div>
+            
+            {% if cartId %}
+            <div class="row my-5">
+                <div class="col-lg-8 col-sm-12"></div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="order-box">
+                        <h3>Order summary</h3>
+                            <div class="d-flex">
+                                <h4>Sub Total</h4>
+                                <div class="ml-auto font-weight-bold">{{ total_price|floatformat:2 }} &#8377;</div>
+                            </div>
+                            <div class="d-flex">
+                                <h4>Discount</h4>
+                                <div class="ml-auto font-weight-bold"> {{ total_discount|floatformat:2 }} &#8377;</div>
+                            </div>
+                        <hr class="my-1">
+                        
+                        
+                        <div class="d-flex">
+                            <h4>Delivery  Charge</h4>
+                            <div class="ml-auto font-weight-bold"> Free </div>
+                        </div>
+                        <hr>
+                        <div class="d-flex gr-total">
+                            <h5>Grand Total</h5>
+                            <div class="ml-auto h5">{{ cart.sub_total|floatformat:2 }} &#8377;</div>
+                        </div>
+                        <hr> </div>
+                </div>
+                <input type="hidden" name="" id="cart-id-ch" value="{{ cartId }}" disabled>
+                <div class="col-12 d-flex shopping-box">
+                    <a href="#" id="checkout-btn" class="ml-auto btn hvr-hover">Checkout</a>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+  </div>
+
+</div>
+    <!-- End Cart -->
+
+
+{% endblock %}
+
+{% block javascript %}
+
+
+<!-- Add this code inside your HTML file where the checkout button is located -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#checkout-btn').click(function(event) {
+            event.preventDefault(); // Prevent the default action of the button
+
+            var cartId = $('#cart-id-ch').val();  // Get the cartId from the data attribute of the button
+            
+            // Send an AJAX request to checkout
+            $.ajax({
+                type: 'GET', // Assuming GET method for checkout
+                url: `/checkout_page/${cartId}/`, // URL for the checkout view
+                success: function(response) {
+                    if (response.error) {
+                        // Show error message using SweetAlert if there's an error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Checkout Failed',
+                            text: response.error
+                        });
+                    } else {
+                        // Redirect to the checkout success page if all products are in stock
+                        window.location.href = `/checkout_page/${cartId}/`; // Replace with your actual success page URL
+                    }
+                },
+               
+            });
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Handle plus button click
+        $('.plus-button').on('click', function() {
+            const input = $(this).next('input');
+            const currentQuantity = parseInt(input.val());
+            const newQuantity = currentQuantity + 1;
+            const cartId = input.data('cart-id');
+            const productId = input.attr('name').split('_')[1];
+            const branchId = $('#branch-select').val(); // Get the selected branch ID
+
+            updateCartItem(cartId, productId, newQuantity, input, branchId); // Pass the branch ID to the function
+        });
+
+        // Handle minus button click
+        $('.minus-button').on('click', function() {
+            const input = $(this).prev('input');
+            const currentQuantity = parseInt(input.val());
+            const newQuantity = currentQuantity - 1;
+            const cartId = input.data('cart-id');
+            const productId = input.attr('name').split('_')[1];
+            const branchId = $('#branch-select').val(); // Get the selected branch ID
+
+            if (newQuantity > 0) {
+                updateCartItem(cartId, productId, newQuantity, input, branchId); // Pass the branch ID to the function
+            }
+        });
+
+        // Function to update cart item
+        function updateCartItem(cartId, productId, newQuantity, input, branchId) {
+            const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+            $.ajax({
+                url: '/cart/update/',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: csrfToken,
+                    cart_id: cartId,
+                    product_id: productId,
+                    new_quantity: newQuantity,
+                    branch_id: branchId // Include branch ID in the data sent to the backend
+                },
+                success: function(response) {
+                    // Handle success response
+                    input.val(response.new_quantity);
+                    const totalPriceElement = input.closest('tr').find('.total-pr p');
+                    totalPriceElement.text(response.item_total);
+                    const totalCartPriceElement = $('#cart-total-price');
+                    totalCartPriceElement.text(response.cart_total);
+                    const grandTotalElement = $('#grand-total');
+                    grandTotalElement.text(response.grand_total);
+                },
+                error: function(response) {
+                    // Handle error response with sweet alert
+                    const errorMessage = response.responseJSON.error;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage
+                    });
+                }
+            });
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+    // Event listener for branch dropdown change
+    $('#branch-select').on('change', function() {
+        // Submit the form when branch selection changes
+        $('#branch-select-form').submit();
+    });
+});
+
+</script>
+
+
+
+{% endblock javascript %}
+

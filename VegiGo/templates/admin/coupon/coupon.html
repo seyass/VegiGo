@@ -1,0 +1,54 @@
+{% extends 'admin/base.html' %}
+
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Coupon</b></h2>
+   </div>
+     <div class="col-lg-2 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Coupon</b></li>  
+     </ul>
+    </div>
+    <div class="col-2 mt-4"><a href="{% url 'add_coupon' %}"
+      style="border-radius: .375rem;"
+       class="btn hvr-hover mt-2">Add Coupon</a></div>
+</div>
+{% endblock %}
+{% block content %}
+
+  <div class="container">
+    <table class="table">
+    <thead style="background-color: #7755A2; color: white;">
+        <th scope="col">Coupon </th>
+        <th scope="col">discount amount</th>
+        <th scope="col">start date</th>
+        <th scope="col">end date</th>
+        <th scope="col">minimum amount</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for item in coupons %}
+      <tr class="table-success">
+        <td>{{ item.code }}</td>
+        <td>{{ item.discount_amount }}</td>
+        <td>{{ item.start_date }}</td>
+        <td>{{ item.end_date }}</td>
+        <td>{{ item.minimum_purchase }}</td>
+        <td>
+            <a href="{% url 'edit_coupon' item.id %}" class="btn hvr-hover"><i class="fa-regular fa-pen-to-square"></i></a>
+            <a href="{% url 'delete_coupon' item.id %}" style="background-color: red;"  class="btn hvr-hover"><i class="fa-solid fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+
+
+
+{% endblock %}
+

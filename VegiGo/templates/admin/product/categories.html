@@ -1,0 +1,84 @@
+<!-- categories.html -->
+{% extends 'admin/base.html' %}
+
+{% block title %}
+  Categories 
+{% endblock %}
+
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Categories</b></h2>
+   </div>
+     <div class="col-lg-2 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Categories</b></li>  
+     </ul>
+     
+      
+    </div>
+    <div class="col-2 mt-4"><a href="{% url 'create_category' %}"
+      style="border-radius: .375rem;"
+       class="btn hvr-hover mt-2">Add Category</a></div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container">
+  <table class="table" style="border-radius: .375rem;">
+    <thead style="color: white; background-color: #7755A2;">
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Image</th>
+        <th scope="col">Description</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for category in categories %}
+      <tr class="table-success">
+        <td>
+          <div>{{ category.name }}</div>
+        </td>
+        <td>
+          <div><img src="{{ category.image.url }}" alt="{{ category.name }}" style="max-width: 60px; max-height: 60;"></div>
+          </td>
+        <td>{{ category.description }}</td>
+        <td>
+          <a href="{% url 'edit_category' category.id %}" class="btn hvr-hover"><i class="fa-regular fa-pen-to-square"></i></a>
+          <a style="background-color: red;" href="{% url 'deleteCategory' category.id %}" class="btn hvr-hover"><i class="fa-solid fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+  
+
+  <!-- Pagination -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if categories.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1">First</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ categories.previous_page_number }}">Previous</a>
+      </li>
+      {% endif %}
+      {% for num in categories.paginator.page_range %}
+      <li class="page-item {% if num == categories.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+      </li>
+      {% endfor %}
+      {% if categories.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ categories.next_page_number }}">Next</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ categories.paginator.num_pages }}">Last</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endblock %}

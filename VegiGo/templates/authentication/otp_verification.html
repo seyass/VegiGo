@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta name="author" content="CodeHim">
+   <title>VegiGo OTP Verification</title>
+   <!-- Style CSS -->
+   <link rel="stylesheet" href="{% static 'css/otpstyle.css' %}">
+   <!-- Demo CSS (No need to include it into your project) -->
+   <link rel="stylesheet" href="{% static 'css/otpsyle.css' %}">
+   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'>
+   <script src="https://kit.fontawesome.com/51e5ffc4ad.js" crossorigin="anonymous"></script>
+</head>
+<body>
+   <header class="cd__intro">
+      <h1>OTP Verify VegiGo</h1>
+      
+   </header>
+   <!--$%adsense%$-->
+   <main class="cd__main">
+      <div class="container-fluid bg-body-tertiary d-block">
+         <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4" style="min-width: 500px;">
+               <div class="card bg-white mb-5 mt-5 border-0" style="box-shadow: 0 12px 15px rgba(0, 0, 0, 0.02);">
+                  <div class="card-body p-5 text-center">
+                     <h4>Verify</h4>
+                     <p>Your code was sent to you via email</p>
+                     <form method="POST" action="{% url 'otp_verification' %}">
+                        {% csrf_token %}
+                        <div class="otp-field mb-4">
+                           <input type="number" name="otp1" />
+                           <input type="number" name="otp2" disabled />
+                           <input type="number" name="otp3" disabled />
+                           <input type="number" name="otp4" disabled />
+                           <input type="number" name="otp5" disabled />
+                           <input type="number" name="otp6" disabled />
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-3">Verify</button>
+                     </form>
+                     {% if error_message %}
+                     <p>{{ error_message }}</p>
+                     {% endif %}
+                     <p id="timer">Resend OTP in 30 seconds</p>
+                     <a href="{% url 'resend_otp' %}" id="resendButton" class="btn btn-link" disabled>Resend OTP</a>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </main>
+   <!-- Script JS -->
+   <script src="{% static 'js/otpjs.js' %}"></script>
+   <script>
+      var timerElement = document.getElementById('timer');
+      var resendButton = document.getElementById('resendButton');
+      var countdown = 30;
+
+      function startTimer() {
+         var timer = setInterval(function() {
+            countdown--;
+            if (countdown <= 0) {
+               clearInterval(timer);
+               timerElement.innerHTML = 'You can resend OTP now';
+               resendButton.removeAttribute('disabled');
+            } else {
+               timerElement.innerHTML = 'Resend OTP in ' + countdown + ' seconds';
+            }
+         }, 1000);
+      }
+
+      // Start the timer when the page loads
+      startTimer();
+
+      // Prevent default action when clicking on the resend button if it's disabled
+      resendButton.addEventListener('click', function(event) {
+         if (resendButton.getAttribute('disabled') !== null) {
+            event.preventDefault();
+         }
+      });
+   </script>
+   <!--$%analytics%$-->
+</body>
+</html>

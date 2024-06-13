@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 - Page Not Found</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 50px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    h1 {
+      font-size: 24px;
+    }
+
+    p {
+      font-size: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  {% if msg %}
+  <p>{{ msg }}</p>
+  {% else %}
+  <h1>404 - Page Not Found</h1>
+  <p>Sorry, the page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+  <p></p>
+  <p>Go back to <a href="{% url 'home_page' %}">home page</a>.</p>
+  {% endif %}
+  
+</div>
+
+</body>
+</html>
+
+

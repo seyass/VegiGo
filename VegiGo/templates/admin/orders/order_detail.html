@@ -1,0 +1,83 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+User Orders - Admin Panel
+{% endblock %}
+
+{% block content %}
+<table class="table" style="background-color: rgb(242, 233, 217); color: black;">
+    <thead>
+        <tr>
+            <th scope="col">User</th>
+            <th scope="col">Product</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Order Date</th>
+            <th scope="col">Total Price</th>
+            <th scope="col">Order Status</th>
+            <th scope="col">Payment Method</th>
+            <th scope="col">Payment Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+            {% for order in items %}
+            <tr>
+                <td>{{ order.order.user.username }}</td>
+                <td>{{ order.product.product }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>{{ order.item_created_at|date:"d/m/Y" }}</td>
+                <td>{{ order.subtotal }}</td>
+                <td>
+                    {% if order.user_cancel %}
+                        {{ order.status }}
+                    {% elif order.status == 'returned' %}
+                        {{ order.status }}
+                    {% elif order.status == 'delivered' %}
+                        {{ order.status }}
+                    {% else %}
+                    <select class="order-status-dropdown" data-order-item-id="{{ order.id }}">
+                        <option value="{{ order.status }}">{{ order.status }}</option>
+                        {% for choice in order.STATUS_CHOICES %}
+                            <option value="{{ choice.0 }}" {% if order.status == choice.0 %}selected{% endif %}>
+                                {{ choice.1 }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% endif %}
+                    
+                </td>
+                <td>{{ order.order.payment_method }}</td>
+                <td>{{ order.payment_status }}</td>
+            </tr>
+            {% endfor %}
+       
+    </tbody>
+</table>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Event handler for when the order status dropdown is changed
+    $('.order-status-dropdown').on('change', function() {
+        var orderItemId = $(this).data('order-item-id');
+        var newStatus = $(this).val();
+        var csrfToken = '{{ csrf_token }}';
+
+        // AJAX request to update the order status
+        $.ajax({
+            url: '/update_order_status/',
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: csrfToken,
+                order_item_id: orderItemId,
+                new_status: newStatus
+            },
+            error: function() {
+                alert('An error occurred while updating the order status.');
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

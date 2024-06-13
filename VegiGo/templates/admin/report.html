@@ -1,0 +1,80 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}  Report page {% endblock %}
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Report </b></h2>
+   </div>
+     <div class="col-lg-3 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Report</b></li>
+     </ul>
+    </div>
+</div>
+{% endblock %}
+{% block content %}   
+<div class="container mt-5 col-6">
+    <h2>Select Report Type</h2>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div class="mb-3">
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="report_type" value="daily" id="daily" checked>
+                <label class="form-check-label" for="daily">Daily</label>
+            </div>
+
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="report_type" value="weekly" id="weekly">
+                <label class="form-check-label" for="weekly">Weekly</label>
+            </div>
+
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="report_type" value="monthly" id="monthly">
+                <label class="form-check-label" for="monthly">Monthly</label>
+            </div>
+
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="report_type" value="yearly" id="yearly">
+                <label class="form-check-label" for="yearly">Yearly</label>
+            </div>
+
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="report_type" value="custom" id="custom">
+                <label class="form-check-label" for="custom">Custom Date Range</label>
+            </div>
+        </div>
+
+        <div class="mb-9" id="custom-date-range" style="display: none;">
+            <label for="custom_start_date">From:</label>
+            <input type="date" class="form-control" name="custom_start_date" id="custom_start_date">
+
+            <label for="custom_end_date" class="mt-2">To:</label>
+            <input type="date" class="form-control" name="custom_end_date" id="custom_end_date">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+    </form>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reportTypeInputs = document.querySelectorAll('input[name="report_type"]');
+        const customDateRange = document.getElementById('custom-date-range');
+
+        reportTypeInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customDateRange.style.display = 'block';
+                } else {
+                    customDateRange.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}

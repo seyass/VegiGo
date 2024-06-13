@@ -1,0 +1,159 @@
+{% extends 'customer/base.html' %}
+
+{% block breadcrumb %}
+<div class="all-title-box">
+   <div class="container">
+       <div class="row">
+           <div class="col-lg-12">
+               <h2>My Account</h2>
+               <ul class="breadcrumb">
+                   <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Shop</a></li>
+                   <li class="breadcrumb-item"><a href="{% url 'orders_page' %}">Orders</a></li>
+                   <li class="breadcrumb-item active">Order Details</li>
+               </ul>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+   
+  .gradient-custom {
+
+  background: #7755A2;
+
+  background: #7755A2;
+
+  background: #7755A2;
+
+}
+
+</style>
+<h1> Order details</h1>
+
+<section class="h-100 gradient-custom">
+    <div class="container py-4 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-lg-12 col-xl-9">
+          <div class="card" style="border-radius: 10px;">
+            <div class="card-header">
+              <h5 class="text-muted mb-0">Thanks for your Order, <span style="color: #06A245;">{{ order.user.username }}</span>!</h5>
+            </div>
+            <div class="card-body">
+              
+              <div class="card shadow-0 border mb-4 mt-1">
+                
+                <div class="card-body">
+                  {% for item in items %}
+                  <div class="row mt-2">
+                    <div class="col-md-2">
+                      <img src="{{item.image.url }}"
+                        class="img-fluid" alt="Phone">
+                    </div>
+                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0"> <b>{{ item.product.product }}</b></p>
+                    </div>
+                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0 small">Qty: {{ item.quantity }}</p>
+                    </div>
+                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0 small">{{ item.subtotal }}</p>
+                    </div>
+                  </div>
+                  
+                  <div class="row d-flex align-items-center">
+                    <div class="col-md-2">
+                      <p class="text-muted mb-0 small">Track Order</p>
+                    </div>
+                    <div class="col-md-10">
+                      <div class="d-flex justify-content-around mb-1">
+                        <p class="text-muted mt-1 mb-0 small ms-xl-5">{{ item.payment_status }}</p>
+                        <!-- modal start for Cancel -->
+
+                        <!-- Button trigger modal -->
+                        <p>{{ item.status }}</p>
+                        {% if item.status == 'delivered' %}
+                        <a href="{% url 'return_request' item.id %}" class="btn hvr-hover">Return</a>
+                        {% elif item.status == 'Return Requested' %}
+                        <p>return requested</p>
+                        {% elif item.status == 'completed' %}
+                        <p>completed</p>
+                        {% elif item.status == 'returned' %}
+                        <p>{{ item.status }}</p>
+                        {% elif item.status != 'cancelled' %}
+                        <button type="button" class="btn hvr-hover" data-toggle="modal" data-target="#exampleModal">
+                          Cancel
+                         </button>
+                        {% endif %}
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <a class="btn hvr-hover" href="{% url 'user_order_cancel' item.id %}">Confirm</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+                        <!-- mddal end for Cancel -->
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="mb-4" style="background-color: #06A245; opacity: 1;">
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="d-flex justify-content-between pt-2">
+                <p class="fw-bold mb-0">Order Details</p>
+                <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span> {{ order.total_price }}</p>
+              </div>
+  
+              <div class="d-flex justify-content-between pt-2">
+                <p class="text-muted mb-0">Order Number : {{ order.id }}</p>
+                <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> {{ order.total_discount }}</p>
+              </div>
+  
+              <!-- <div class="d-flex justify-content-between">
+                <p class="text-muted mb-0">Invoice Date : 22 Dec,2019</p>
+                <p class="text-muted mb-0"><span class="fw-bold me-4">GST 18%</span> 123</p>
+              </div> -->  
+
+              <div class="d-flex justify-content-between mb-5">
+                <p class="text-muted mb-0">Download invoice : <!-- Assuming you have an order details template -->
+                  <a href="{% url 'download_invoice' order.id %}">Download Invoice</a>
+                  </p>
+                <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> Free</p>
+              </div>
+            </div>
+            <div class="card-footer border-0 px-4 py-5"
+              style="background-color: #06A245; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+              <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total
+                paid:  <span class="h2 mb-0 ms-2">{{ order.total_price }}</span></h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
+
+
