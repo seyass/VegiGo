@@ -66,13 +66,13 @@ class Cart(models.Model):
         
 
     def calculate_total_price(self):
-        total_price = sum(item.total_price for item in self.items.all())
-        self.sub_total = total_price
+        total_price_all = sum(item.total_price for item in self.items.all())
+        self.sub_total = total_price_all
         if self.select_coupon and self.is_coupon_valid():
             if self.select_coupon.discount_amount > 0:
                 self.sub_total -= self.select_coupon.discount_amount
             else:
-                self.sub_total = total_price
+                self.sub_total = total_price_all
         else:
             self.select_coupon = None  # Remove the coupon if it's not valid
         self.save()

@@ -191,7 +191,7 @@ def cart_page(request):
         branches = Branches.objects.filter(is_active=True)
         try:
             cart = Cart.objects.get(user=request.user)
-            items = cart.items.all()
+            items = CartItem.objects.filter(cart=cart).order_by('product__name')
             # Annotate the maximum quantity available for each product at the selected branch
             if cart.location:
                 for item in items:
@@ -215,7 +215,6 @@ def cart_page(request):
                 total_selling_price += item.total_price
             total_discount = total_price - total_selling_price
             grand_total = total_price - total_discount
-            
             return render(request, "customer/cart.html", {"items": items,'cart':cart,
                 'total_price': total_price,
                 'total_discount': total_discount,
@@ -224,7 +223,7 @@ def cart_page(request):
                 'branches':branches,
                 
                 })
-        
+
         except ObjectDoesNotExist:
             items = []
             return render(request, "customer/cart.html", {'items': items,'cartId':None,'branches':branches})
@@ -310,61 +309,59 @@ def update_cart_item(request):
         
         max_quantity_qs = ProductLocations.objects.filter(product_id=product_id, location_id=branchId).values_list('quantity', flat=True)
         max_quantity = max_quantity_qs.first() if max_quantity_qs.exists() else None
-        print(max_quantity)
         if max_quantity:
             if new_quantity > max_quantity:
                 return JsonResponse({'error': 'The quantity limits exceeds'}, status=404)
         
         
-        #try:
-        cart_item = CartItem.objects.get(cart_id=cart_id, product_id=product_id)
-
-        cart_item.quantity = new_quantity
-        cart_item.save()
-        cart = Cart.objects.get(id=cart_id)
-        item_total = 0
-        
-        items = cart.items.all()
-        for item in items:
-            lo = item.product.productlocations_set
-            q = ProductLocations.objects.filter(product=item.product,location=Branches.objects.get(id=branchId))
-            if q.exists():
-                for i in q:
-                   item.max_quantity = i.quantity
-            else:
-                item.max_quantity = 0
-            item.save()
-        total_selling_price = 0
-        
+        try:
+            cart_item = CartItem.objects.get(cart=request.user.cart, product_id=product_id)
+            cart_item.quantity = new_quantity
+            cart_item.save()
+            cart = Cart.objects.get(id=cart_id)
+            item_total = 0
             
-        for item in items:
-            total_selling_price += item.total_price
+            items = cart.items.all()
+            for item in items:
+                lo = item.product.productlocations_set
+                q = ProductLocations.objects.filter(product=item.product,location=Branches.objects.get(id=branchId))
+                if q.exists():
+                    for i in q:
+                        item.max_quantity = i.quantity
+                else:
+                    item.max_quantity = 0
+                item.save()
+            total_selling_price = 0
+            
+                
+            for item in items:
+                total_selling_price += item.total_price
 
-        total_price = sum(item.product.price * item.quantity for item in items)
-        item_total = cart_item.total_price
+            total_price = sum(item.product.price * item.quantity for item in items)
+            item_total = cart_item.total_price
 
-        total_discount = total_price - total_selling_price
-        grand_total = total_price - total_discount
-        cart = Cart.objects.get(id=cart_id)
-        cart_total = sum(item.quantity * item.product.price for item in cart.items.all())
+            total_discount = total_price - total_selling_price
+            grand_total = total_price - total_discount
+            cart = Cart.objects.get(id=cart_id)
+            cart_total = sum(item.quantity * item.product.price for item in cart.items.all())
+            cart.calculate_total_price
+            cart.save()
+            print(cart.sub_total)
+            return JsonResponse({
+                'new_quantity': cart_item.quantity,
+                'item_total': item_total,
+                'cart_total': cart_total,
+                'grand_total': grand_total,
+                'total_discount':total_discount,
+            })
+
+        except CartItem.DoesNotExist:
         
-        cart_mode = False
-        
-        return JsonResponse({
-            'new_quantity': cart_item.quantity,
-            'item_total': item_total,
-            'cart_total': cart_total,
-            'grand_total': grand_total,
-            'total_discount':total_discount,
-        })
+            return JsonResponse({'error': 'Cart item not found'}, status=404)
 
-        # except CartItem.DoesNotExist:
-        
-        #     return JsonResponse({'error': 'Cart item not found'}, status=404)
-
-        # except Exception as e:
-        #     print(e)
-        #     return JsonResponse({'error': str(e)}, status=500)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'error': str(e)}, status=500)
 
     
     return JsonResponse({'error': 'Invalid request method'}, status=400)
@@ -372,6 +369,7 @@ def update_cart_item(request):
 def update_cart_location(request):
 
     if request.method == "POST":
+        print('ivedecedececdee')
         cart_id = request.POST.get('cart_id')
         branch_id = request.POST.get('branch_id')
         try:
@@ -648,6 +646,14 @@ def wallet_page(request):
 @register.filter
 def get_item(dictionary,key):
     return dictionary.get(key)
+
+
+
+
+
+
+
+
 
 
 
