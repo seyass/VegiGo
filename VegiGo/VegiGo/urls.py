@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from . import settings
 from authentication import views
-
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/',admin.site.urls),
-    path('home/',include('home.urls')),
+    path('',include('home.urls')),
     path('authentication',include('authentication.urls')),
     path('vgadmin/',include('vgadmin.urls')) ,
     path("productmanagement/",include('productmanagement.urls')),
@@ -28,4 +29,4 @@ urlpatterns = [
     path('ordermanagement/',include('ordermanagement.urls')),
     path('accounts/',include('allauth.urls'))
     
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

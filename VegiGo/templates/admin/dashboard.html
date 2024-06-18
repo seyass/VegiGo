@@ -6,7 +6,7 @@
     <div class="col-lg-8 mt-5">
      <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Dashboard</b></h2>
    </div>
-     <div class="col-lg-3 mt-4">
+     <div class="col-sm-3 mt-4">
        <ul class="breadcrumb" style="background-color: #06A245;">
          <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
          <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Dashboard</b></li>
@@ -131,7 +131,7 @@
     function updateCharts() {
       const timeframe = timeframeSelect.value;
 
-      fetch(`/dashboard/data/?timeframe=${timeframe}`)
+      fetch(`/vgadmin/dashboard/data/?timeframe=${timeframe}`)
         .then(response => response.json())
         .then(data => {
           updateChart(ordersChart, data.orders_data, 'Total Orders');

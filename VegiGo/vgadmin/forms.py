@@ -18,6 +18,11 @@ class BranchesForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter branch name'}),
             
         }
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if name.isdigit():
+            raise forms.ValidationError("Branch name cannot contain only numbers.")
+        return name
 
 class CouponForm(forms.ModelForm):
     class Meta:

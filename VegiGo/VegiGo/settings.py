@@ -98,10 +98,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'vegigo',
-        'HOST' :'localhost',
+        'HOST' :'localhost',#'vegigo.cpoggai6wuj9.eu-north-1.rds.amazonaws.com'
         "PORT":'5432',
-        "USER":'postgres',
-        "PASSWORD":'Sre@8281'
+        "USER":'postgres',# 'vegigosuperuser'
+        "PASSWORD":'Sre@8281' # 'Srey8281'
     }
 }
 

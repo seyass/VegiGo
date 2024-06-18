@@ -78,7 +78,7 @@
                                     <div class="media mb-2 border-bottom">
                                         <div class="media-body">
                                             <a href="#">{{ item.product.name }}</a>
-                                            <div class="small text-muted">Price: {{ item.product.price }} &#8377;<span class="mx-2">|</span> Qty: {{ item.quantity }} <span class="mx-2">|</span> Subtotal: {{ item.total_price }} &#8377;</div>
+                                            <div class="small text-muted">Buy Price: {{ item.product.special_discount|floatformat:2 }} &#8377;<span class="mx-2">|</span> Qty: {{ item.quantity }} <span class="mx-2">|</span> Subtotal: {{ item.total_price|floatformat:2 }} &#8377;</div>
                                         </div>
                                     </div>
                                     {% endfor %}
@@ -102,7 +102,7 @@
                                         </div>
                                         {% for coupon in coupons %}
 
-                                        <div class="small text-muted">Code: {{ coupon.code }} ;<span class="mx-2">|</span> Minimum purchase: {{ coupon.minimum_purchase }} &#8377;</div>
+                                        <div class="small text-muted">Code: {{ coupon.code }} ;<span class="mx-2">|</span> Disount: {{ coupon.discount_amount }} &#8377;</div>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -221,7 +221,7 @@
             // Send an AJAX request to apply the coupon
             $.ajax({
                 type: 'POST',
-                url: applyCouponUrl, // Use the manually provided URL
+                url: '/customer/checkout/coupon/apply/', // Use the manually provided URL
                 headers: {
                     "X-CSRFToken": csrfToken // Include CSRF token in the request header
                 },
@@ -231,7 +231,7 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        window.location.href = `/checkout_page/${cartId}/`
+                        window.location.href = `/customer/checkout/${cartId}/`
                     } else if (response.error) {
                         Swal.fire({
                             icon: 'error',
@@ -252,6 +252,5 @@
     });
 </script>
 {% endblock %}
-
 
 

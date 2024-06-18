@@ -69,12 +69,13 @@
                                                     </a>
                                                 </td>
                                                 <td class="name-pr">
-                                                    <a href="#">{{ item.product.name }}</a>
+                                                    <a href="{% url 'product_shop_page' item.product.id %}">{{ item.product.name }}</a>
                                                 </td>
-                                                <td class="price-pr">{{item.product.special_discount}} </td>
+                                                <td class="price-pr">{{item.product.special_discount|floatformat:2}} </td>
                                                 <td>
                                                     {% if item.max_quantity > 0 %}
-                                                    <button class="plus-button"><i class="fa-solid fa-plus"></i></button>
+                                                    
+                                                    <button class="minus-button"><i class="fa-solid fa-minus"></i></button>  
                                                         <input style="width: 45px; text-align: center;" 
                                                             type="text" 
                                                             name="quantity_{{ item.product.id }}" 
@@ -84,7 +85,9 @@
                                                             max="{{ item.max_quantity }}" 
                                                             value="{{ item.quantity }}"
                                                         >
-                                                        <button class="minus-button"><i class="fa-solid fa-minus"></i></button>
+                                                        <button class="plus-button"><i class="fa-solid fa-plus"></i></button>
+
+                                                                
                                                     {% elif item.max_quantity == 0 %}
                                                         <span>Out of Stock</span>
                                                     {% endif %}
@@ -110,8 +113,8 @@
                                     </table>
                                 </div>
                             </div>
-                        
-                    
+                
+                                                                                                      
                     <!-- Other cart content -->
                 </div>
             </div>
@@ -176,7 +179,7 @@
             // Send an AJAX request to checkout
             $.ajax({
                 type: 'GET', // Assuming GET method for checkout
-                url: `/checkout_page/${cartId}/`, // URL for the checkout view
+                url: `/customer/checkout/${cartId}/`, // URL for the checkout view
                 success: function(response) {
                     if (response.error) {
                         // Show error message using SweetAlert if there's an error
@@ -187,7 +190,7 @@
                         });
                     } else {
                         // Redirect to the checkout success page if all products are in stock
-                        window.location.href = `/checkout_page/${cartId}/`; // Replace with your actual success page URL
+                        window.location.href = `/customer/checkout/${cartId}/`; // Replace with your actual success page URL
                     }
                 },
                
@@ -198,68 +201,69 @@
 
 <script>
     $(document).ready(function() {
-        // Handle plus button click
-        $('.plus-button').on('click', function() {
-            const input = $(this).next('input');
-            const currentQuantity = parseInt(input.val());
-            const newQuantity = currentQuantity + 1;
-            const cartId = input.data('cart-id');
-            const productId = input.attr('name').split('_')[1];
-            const branchId = $('#branch-select').val(); // Get the selected branch ID
+    // Handle plus button click
+    $('.plus-button').on('click', function() {
+        const input = $(this).prev('input');
+        const currentQuantity = parseInt(input.val());
+        const newQuantity = currentQuantity + 1;
+        const cartId = input.data('cart-id');
+        const productId = input.attr('name').split('_')[1];
+        const branchId = $('#branch-select').val(); // Get the selected branch ID
 
+        updateCartItem(cartId, productId, newQuantity, input, branchId); // Pass the branch ID to the function
+    });
+
+    // Handle minus button click
+    $('.minus-button').on('click', function() {
+        const input = $(this).next('input');
+        const currentQuantity = parseInt(input.val());
+        const newQuantity = currentQuantity - 1;
+        const cartId = input.data('cart-id');
+        const productId = input.attr('name').split('_')[1];
+        const branchId = $('#branch-select').val(); // Get the selected branch ID
+
+        if (newQuantity > 0) {
             updateCartItem(cartId, productId, newQuantity, input, branchId); // Pass the branch ID to the function
-        });
-
-        // Handle minus button click
-        $('.minus-button').on('click', function() {
-            const input = $(this).prev('input');
-            const currentQuantity = parseInt(input.val());
-            const newQuantity = currentQuantity - 1;
-            const cartId = input.data('cart-id');
-            const productId = input.attr('name').split('_')[1];
-            const branchId = $('#branch-select').val(); // Get the selected branch ID
-
-            if (newQuantity > 0) {
-                updateCartItem(cartId, productId, newQuantity, input, branchId); // Pass the branch ID to the function
-            }
-        });
-
-        // Function to update cart item
-        function updateCartItem(cartId, productId, newQuantity, input, branchId) {
-            const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-
-            $.ajax({
-                url: '/cart/update/',
-                method: 'POST',
-                data: {
-                    csrfmiddlewaretoken: csrfToken,
-                    cart_id: cartId,
-                    product_id: productId,
-                    new_quantity: newQuantity,
-                    branch_id: branchId // Include branch ID in the data sent to the backend
-                },
-                success: function(response) {
-                    // Handle success response
-                    input.val(response.new_quantity);
-                    const totalPriceElement = input.closest('tr').find('.total-pr p');
-                    totalPriceElement.text(response.item_total);
-                    const totalCartPriceElement = $('#cart-total-price');
-                    totalCartPriceElement.text(response.cart_total);
-                    const grandTotalElement = $('#grand-total');
-                    grandTotalElement.text(response.grand_total);
-                },
-                error: function(response) {
-                    // Handle error response with sweet alert
-                    const errorMessage = response.responseJSON.error;
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: errorMessage
-                    });
-                }
-            });
         }
     });
+
+    // Function to update cart item
+    function updateCartItem(cartId, productId, newQuantity, input, branchId) {
+        const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+        $.ajax({
+            url: `/customer/cart/update/`,
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: csrfToken,
+                cart_id: cartId,
+                product_id: productId,
+                new_quantity: newQuantity,
+                branch_id: branchId // Include branch ID in the data sent to the backend
+            },
+            success: function(response) {
+                // Handle success response
+                input.val(response.new_quantity);
+                const totalPriceElement = input.closest('tr').find('.total-pr p');
+                totalPriceElement.text(response.item_total);
+                const totalCartPriceElement = $('#cart-total-price');
+                totalCartPriceElement.text(response.cart_total);
+                const grandTotalElement = $('#grand-total');
+                grandTotalElement.text(response.grand_total);
+            },
+            error: function(response) {
+                // Handle error response with sweet alert
+                const errorMessage = response.responseJSON.error;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage
+                });
+            }
+        });
+    }
+});
+
 </script>
 <script>
     $(document).ready(function() {

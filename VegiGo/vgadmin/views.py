@@ -87,6 +87,10 @@ def dashboard_page(request):
     # If user is not authenticated, redirect to login or handle accordingly
     
 def get_dashboard_data(request):
+
+    if 'isusername' not in request.session:
+        return redirect(signin_page)
+
     timeframe = request.GET.get('timeframe', 'weekly')
     product_id = request.GET.get('product', None)
 
@@ -115,8 +119,6 @@ def get_dashboard_data(request):
         'revenue_data': revenue_data,
     }
     return JsonResponse(data)
-
-
 
 def admin_report(request):
 
@@ -328,8 +330,8 @@ def delete_branch(request,branchId):
 
     if 'isusername' not in request.session:
         
-
         return redirect(signin_page)
+    
     branch = models.Branches.objects.get(id=branchId)
     branch.delete()
     return redirect(branches_page)

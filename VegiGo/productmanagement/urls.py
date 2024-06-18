@@ -15,7 +15,7 @@ urlpatterns = [
 
     ### admin category management
     path('vgadmin/categories/',views.category_page,name='categories'),
-    path('vgadmin/category/add',views.create_category,name='create_category'),
+    path('vgadmin/category/add/',views.create_category,name='create_category'),
     path('vgadmin/category/edit/<int:catId>/',views.edit_category,name='edit_category'),
     path('vgadmin/category/delete/<int:catId>/',views.delete_category,name='deleteCategory'),
     path('vgadmin/category/update/<int:category_id>/', views.update_category, name='update_category'),

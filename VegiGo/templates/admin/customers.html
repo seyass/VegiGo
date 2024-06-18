@@ -1,63 +1,116 @@
-<!-- customers.html -->
 {% extends 'admin/base.html' %}
 
 {% block title %}
   Customers - Admin Panel
 {% endblock %}
+
 {% block breadcrumb %}
 <div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
     <div class="col-lg-8 mt-5">
-     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Customers</b></h2>
-   </div>
-     <div class="col-lg-2 mt-4">
-       <ul class="breadcrumb" style="background-color: #06A245;">
-         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
-         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Customers</b></li>
-     </ul>
+        <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Customers</b></h2>
+    </div>
+    <div class="col-lg-2 mt-4">
+        <ul class="breadcrumb" style="background-color: #06A245;">
+            <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+            <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Customers</b></li>
+        </ul>
     </div>
 </div>
 {% endblock %}
+
 {% block content %}
- 
-  <div class="container">
+<div class="container">
     <table class="table">
-      <thead style="background-color: #7755A2; color: white;">
-        <tr>
-          <th scope="col">Username</th>
-          <th scope="col">Email</th>
-          <th scope="col">Status</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for customer in customers %}
-        <tr class="table-success">
-          <td>{{ customer.username }}</td>
-          <td>{{ customer.email }}</td>
-          <td>
-            {% if customer.is_blocked == False %}
-              <p>Active</p>
-            {% else %}
-              <p>Blocked</p>
-            {% endif %}
-          </td>
-          </td>
-          <td>
-            <form method="post" action="{% url 'customers' customer.id %}">
-                {% csrf_token %}
-                {% if customer.is_blocked == False %}
-                    <button style="background-color: red;" class="btn hvr-hover" type="submit" name="status" value="blocked">Block</button>
-                {% else %}
-                    <button  class="btn hvr-hover" type="submit" name="status" value="active">Unblock</button>
-                {% endif %}
-            </form>
-        </td>
-        
-          
-        </tr>
-        {% endfor %}
-      </tbody>
+        <thead style="background-color: #7755A2; color: white;">
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody id="customer-table-body">
+            {% for customer in customers %}
+            <tr class="table-success">
+                <td>{{ customer.username }}</td>
+                <td>{{ customer.email }}</td>
+                <td>
+                    {% if customer.is_blocked == False %}
+                    <p>Active</p>
+                    {% else %}
+                    <p>Blocked</p>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="post" action="{% url 'customers' customer.id %}">
+                        {% csrf_token %}
+                        {% if customer.is_blocked == False %}
+                        <button style="background-color: red;" class="btn hvr-hover" type="submit" name="status" value="blocked">Block</button>
+                        {% else %}
+                        <button class="btn hvr-hover" type="submit" name="status" value="active">Unblock</button>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-  </div>
-  
+
+    <!-- Pagination Controls -->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center" id="pagination-controls">
+            <!-- Pagination items will be injected by JavaScript -->
+        </ul>
+    </nav>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        const itemsPerPage = 7;
+        const $customerTableBody = $('#customer-table-body');
+        const $paginationControls = $('#pagination-controls');
+        const $customerRows = $customerTableBody.children('tr');
+        const totalItems = $customerRows.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        function showPage(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+
+            $customerRows.hide();
+            $customerRows.slice(start, end).show();
+
+            $paginationControls.empty();
+
+            if (page > 1) {
+                $paginationControls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${page - 1}">&laquo;</a></li>`);
+            } else {
+                $paginationControls.append(`<li class="page-item disabled"><span class="page-link">&laquo;</span></li>`);
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === page) {
+                    $paginationControls.append(`<li class="page-item active"><span class="page-link">${i}</span></li>`);
+                } else {
+                    $paginationControls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`);
+                }
+            }
+
+            if (page < totalPages) {
+                $paginationControls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${page + 1}">&raquo;</a></li>`);
+            } else {
+                $paginationControls.append(`<li class="page-item disabled"><span class="page-link">&raquo;</span></li>`);
+            }
+        }
+
+        $paginationControls.on('click', 'a', function(e) {
+            e.preventDefault();
+            const page = $(this).data('page');
+            showPage(page);
+        });
+
+        showPage(1);
+    });
+</script>
 {% endblock %}

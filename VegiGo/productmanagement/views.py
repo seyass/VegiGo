@@ -24,29 +24,20 @@ def admin_page(request):
 def create_category(request):
     if 'isusername' not in request.session:
         # Redirect if the user is not logged in
-        return redirect(signin_page)
+        return redirect('signin_page')
 
     if request.method == 'POST':
-        #try:
-        name = request.POST.get('name')
-        cleaned_name = name.strip()
-        if len(cleaned_name) ==0:
-            msg = 'All fields required'
-            return JsonResponse({'message': msg}, status=400)
-        description = request.POST.get('description')
-        image_file = request.POST.get('cropped_image')
-        new_category = Category(name=name, description=description)
-        new_category.image = image_file
-        new_category.save()
-        
-        return JsonResponse({'message': 'Category created successfully'})
+        form = CategoryForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'message': 'Category created successfully'})
+        else:
+            # Form is not valid, return errors as JSON response
+            return JsonResponse({'errors': form.errors}, status=400)
 
-        # except IntegrityError:
-        #     # Handle integrity constraint violation error
-        #     msg = 'The category already exists'
-        #     return JsonResponse({'message': msg}, status=400)
-
-    return render(request, 'admin/product/add_category.html')
+    # Initialize an empty form for GET requests
+    form = CategoryForm()
+    return render(request, 'admin/product/add_category.html', {'form': form})
 
 def edit_category(request, catId):
 
@@ -117,7 +108,7 @@ def products_page(request):
         
         return redirect(signin_page)
 
-    products = Product.objects.filter(is_active=True).annotate(total_quantity=Sum('productlocations__quantity'))
+    products = Product.objects.filter(is_active=True).annotate(total_quantity=Sum('productlocations__quantity')).order_by('name')
     return render(request, 'admin/product/products.html', {'products': products})
 
 def add_product(request):
@@ -138,12 +129,14 @@ def add_product(request):
                 price = productForm.cleaned_data['price']
                 selling_price = productForm.cleaned_data['selling_price']
                 discount = (float(price) - float(selling_price)) / float(price) * 100
-                if price < 1:
-                    productForm.add_error('selling_price','Enter a valid price')
-                    return render(request, 'admin/product/add_product.html', {'productForm': productForm, 'categories': categories,'locations':locations,'form':productForm})
-                if selling_price < 1:
-                    productForm.add_error('selling_price','Enter a valid selling price')
                 
+                product_names = Product.objects.filter(is_active=True).values_list('name')
+                name = productForm.cleaned_data['name']
+                for product_name in product_names:
+                    if product_name[0].lower() == name.lower():
+                        productForm.add_error('name','This product already exist')
+                        return render(request, 'admin/product/add_product.html', {'productForm':productForm,'productLocationForm':productLocationForm,'locations':locations,'categories':categories})
+                    
                 product = productForm.save(commit=False)
                 product.category = category
                 product.discount = discount
@@ -166,11 +159,8 @@ def add_product(request):
                             quantity=quantity
                         )
                 return redirect(products_page)
-
-                
-            except IntegrityError:
-                msg = "The product already exists"
-                return render(request, 'admin/product/add_product.html', {'productForm': productForm, 'categories': categories,'msg':msg,'locations':locations})
+            except:
+                return render(request,'404.html')
         else:
 
             return render(request, 'admin/product/add_product.html', {'productForm':productForm,'productLocationForm':productLocationForm,'locations':locations,'categories':categories})
@@ -192,7 +182,6 @@ def update_product(request, product_id):
     product.save()
     return redirect(products_page)
     
-
 def edit_product(request, product_id):
     product = Product.objects.get(id=product_id)
     locations = vgadmin_models.Branches.objects.all()
@@ -209,12 +198,14 @@ def edit_product(request, product_id):
         if productForm.is_valid():
             price = productForm.cleaned_data['price']
             selling_price = productForm.cleaned_data['selling_price']
-            if price < 1:
-                productForm.add_error('selling_price','Enter a valid price')
-                return render(request, 'admin/product/add_product.html', {'productForm': productForm, 'categories': categories,'locations':locations,'form':productForm,'product':product})
-            if selling_price < 1:
-                productForm.add_error('selling_price','Enter a valid selling price')
-                return render(request, 'admin/product/add_product.html', {'productForm': productForm, 'categories': categories,'locations':locations,'form':productForm,'product':product})
+            discount = (float(price) - float(selling_price)) / float(price) * 100
+            product_names = Product.objects.filter(is_active=True).values_list('name')
+            name = productForm.cleaned_data['name']
+            for product_name in product_names:
+                if product_name[0].lower() == name.lower():
+                    productForm.add_error('name','This product already exist')
+                    return render(request, 'admin/product/add_product.html', {'productForm': productForm, 'categories': categories,'locations':locations,'form':productForm,'product':product})
+            product.discount = discount
             product = productForm.save()
 
             # Clear existing locations
@@ -270,15 +261,7 @@ def delete_secondary_image(request, product_id, secondary_image_id):
     # Redirect back to the edit product page
     return redirect('edit_product', product_id=product_id)
 
-def delete_product(request, proId):
-    if 'isusername' not in request.session:
-        # Redirect if the user is not logged in
-        messages.error(request, "You need to sign in first.")
-        return redirect(signin_page)
 
-    product = Product.objects.get(pk=proId)
-    product.delete()
-    return redirect(products_page)
 
 @receiver(pre_delete, sender=Product)
 def delete_product_media(sender, instance, **kwargs):

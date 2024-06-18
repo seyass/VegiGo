@@ -1,7 +1,6 @@
 {% extends 'admin/base.html' %}
 {% load static %}
 
-
 {% block title %}
     Branches
 {% endblock %}
@@ -31,20 +30,25 @@
             <th scope="col">Action</th>
           </tr>
         </thead>
-        <tbody>
-          
+        <tbody id="branch-table-body">
             {% for branch in branches %}
                 <tr class="table-success">
                 <td>{{ branch.name }}</td>
-                
-                    <td>
-                        <a href="{% url 'edit_branch' branch.id %}" class="btn hvr-hover"><i class="fa-regular fa-pen-to-square"></i></a>
-                        <a style="background-color: red;" href="{% url 'delete_branch' branch.id %}" class="btn hvr-hover"><i class="fa-solid fa-trash"></i></a>
-                      </td>
-                    </tr>
+                <td>
+                    <a href="{% url 'edit_branch' branch.id %}" class="btn hvr-hover"><i class="fa-regular fa-pen-to-square"></i></a>
+                    <a style="background-color: red;" href="{% url 'delete_branch' branch.id %}" class="btn hvr-hover"><i class="fa-solid fa-trash"></i></a>
+                </td>
+                </tr>
             {% endfor %}
         </tbody>
       </table>
+
+      <!-- Pagination Controls -->
+      <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center" id="pagination-controls">
+              <!-- Pagination items will be injected by JavaScript -->
+          </ul>
+      </nav>
     </div>
     <div class="col-3">
       <form method="post" action="">
@@ -57,17 +61,62 @@
             <p class="text-danger">{{ form.errors.name }}</p>
             {% endif %}
         </div>
-          <!-- Add a submit button -->
-    <div class="form-group">
-        <button type="submit" class="hvr-hover">Add Branch</button>
-    </div>
-</form>
+        <!-- Add a submit button -->
+        <div class="form-group">
+            <button type="submit" class="hvr-hover">Add Branch</button>
+        </div>
+      </form>
     </div>
   </div>
-  
-  </div>
+</div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        const itemsPerPage = 7;
+        const $branchTableBody = $('#branch-table-body');
+        const $paginationControls = $('#pagination-controls');
+        const $branchRows = $branchTableBody.children('tr');
+        const totalItems = $branchRows.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        function showPage(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+
+            $branchRows.hide();
+            $branchRows.slice(start, end).show();
+
+            $paginationControls.empty();
+
+            if (page > 1) {
+                $paginationControls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${page - 1}">&laquo;</a></li>`);
+            } else {
+                $paginationControls.append(`<li class="page-item disabled"><span class="page-link">&laquo;</span></li>`);
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === page) {
+                    $paginationControls.append(`<li class="page-item active"><span class="page-link">${i}</span></li>`);
+                } else {
+                    $paginationControls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`);
+                }
+            }
+
+            if (page < totalPages) {
+                $paginationControls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${page + 1}">&raquo;</a></li>`);
+            } else {
+                $paginationControls.append(`<li class="page-item disabled"><span class="page-link">&raquo;</span></li>`);
+            }
+        }
+
+        $paginationControls.on('click', 'a', function(e) {
+            e.preventDefault();
+            const page = $(this).data('page');
+            showPage(page);
+        });
+
+        showPage(1);
+    });
+</script>
 {% endblock %}
-
-
-

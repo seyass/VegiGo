@@ -53,7 +53,21 @@ class ProductForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        price = cleaned_data.get('price')
+        selling_price = cleaned_data.get('selling_price')
 
+        if price is not None and selling_price is not None:
+            if price < 1:
+                self.add_error('price', 'Enter a valid price')
+            if selling_price < 1:
+                self.add_error('selling_price', 'Enter a valid selling price')
+            if price < selling_price:
+                self.add_error('selling_price', 'Selling price cannot be greater than the original price')
+
+        return cleaned_data
 
 class ReviewForm(forms.ModelForm):
     RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]

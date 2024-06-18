@@ -1,143 +1,151 @@
 {% extends 'admin/base.html' %}
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% block title %}
+    Add Category
+{% endblock %}
 
 {% block breadcrumb %}
 <div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
     <div class="col-lg-8 mt-5">
-     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Add Category</b></h2>
-   </div>
-     <div class="col-lg-3 mt-4">
-       <ul class="breadcrumb" style="background-color: #06A245;">
-         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
-         <li class="breadcrumb-item"><a href="{% url 'categories' %}"><b>Category</b></a></li>
-         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Add category</b></li>
-     </ul>
+        <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Add Category</b></h2>
+    </div>
+    <div class="col-lg-3 mt-4">
+        <ul class="breadcrumb" style="background-color: #06A245;">
+            <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+            <li class="breadcrumb-item"><a href="{% url 'categories' %}"><b>Category</b></a></li>
+            <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Add category</b></li>
+        </ul>
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <form method="post" enctype="multipart/form-data" id="category-form">
-    {% csrf_token %}
-    <input type="hidden" name="add_catgeroy" value="0">
-    <div class="form-group">
-      <label for="name">Name:</label>
-      <input type="text" class="form-control" id="name" name="name" required>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form method="post" enctype="multipart/form-data" id="category-form">
+        {% csrf_token %}
+        
+        <div class="form-group col-md-6">
+            <label for="id_name">Name:</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <ul class="errorlist">
+                    {% for error in form.name.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group col-md-6">
+            <label for="id_description">Description:</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <ul class="errorlist">
+                    {% for error in form.description.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div class="form-group col-md-6">
+            <label for="id_image">Image:</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <ul class="errorlist">
+                    {% for error in form.image.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div class="card" style="width: 44rem;">
+            <div class="card-body">
+                <h5 class="card-title">Image Preview</h5>
+                <div class="image_container">
+                    <img id="blah" src="#" alt="Preview image" style="max-width: 100%;">
+                </div>
+            </div>
+        </div>
+        
+        <button type="button" class="btn hvr-hover mt-3" id="crop_button">Crop Image</button>
+        <button type="button" class="btn hvr-hover mt-3" id="submit-form">Create Category</button>
+    </form>
     </div>
-    {% if msg %}
-    <p>{{msg}}</p>
-    {% endif %}
+  </div>
     
-    <div class="form-group">
-      <label for="description">Description:</label>
-      <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-    </div>
-    <div class="card" style="width: 44rem;">
-      <div class="form-group">
-        <label for="image">Image:</label>
-        <input type="hidden" name="cropped_image" id="cropped_image">
-        <div id="cropped_result"></div> 
-        <!-- Add a container for the image preview and cropper -->
-      </div>
-      <div class="card-body">
-        <h5 class="card-title">Image</h5>
-      </div>
-    </div>
-    <button type="button" class="btn hvr-hover" id="submit-form">Create</button>
-    <!-- Hidden input to store cropped image data -->
-  </form>
-</div>
-<input type="file" name="image" id="image" onchange="readURL(this);"/>
-
-<div class="image_container">
-    <img id="blah" src="#" alt="your image" />
 </div>
 
-<!-- Cropped image to display (only if you want) -->
-
-  
-<!-- Will trigger crop event -->
-<button id="crop_button">Crop</button> 
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
 <script>
+// Function to preview selected image
 function readURL(input) {
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      $('#blah').attr('src', e.target.result)
-    };
-    reader.readAsDataURL(input.files[0]);
-    setTimeout(initCropper, 1000);
-  }
-}
-
-function readURL(input) {
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      $('#blah').attr('src', e.target.result)
-    };
-    reader.readAsDataURL(input.files[0]);
-    setTimeout(initCropper, 1000);
-  }
-}
-function initCropper(){
-  console.log("Came here")
-  var image = document.getElementById('blah');
-  var cropper = new Cropper(image, {
-    aspectRatio: 1/1,
-    crop: function(e) {
-      console.log(e.detail.x);
-      console.log(e.detail.y);
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#blah').attr('src', e.target.result);
+            setTimeout(initCropper, 1000); // Initialize Cropper after image is loaded
+        };
+        reader.readAsDataURL(input.files[0]);
     }
-  });
+}
 
-  // On crop button clicked
-  document.getElementById('crop_button').addEventListener('click', function(){
-    var imgurl =  cropper.getCroppedCanvas().toDataURL();
-    var img = document.createElement("img");
-    img.src = imgurl;
-    document.getElementById("cropped_result").appendChild(img);
-    document.getElementById("cropped_image").value = imgurl;
+// Function to initialize Cropper
+function initCropper() {
+    var image = document.getElementById('blah');
+    var cropper = new Cropper(image, {
+        aspectRatio: 1 / 1, // Set your desired aspect ratio (square in this case)
+        crop: function(e) {
+            console.log(e.detail.x);
+            console.log(e.detail.y);
+        }
+    });
 
-  })
+    // On crop button clicked
+    document.getElementById('crop_button').addEventListener('click', function() {
+        var imgurl = cropper.getCroppedCanvas().toDataURL();
+        var img = document.createElement("img");
+        img.src = imgurl;
+        document.getElementById("blah").src = imgurl; // Update preview with cropped image
+        document.getElementById("id_image").value = imgurl; // Set cropped image data to form field (hidden in Django forms)
+    });
 }
 
 // Submit the form via AJAX
-document.getElementById('submit-form').addEventListener('click', function(){
-  var formData = new FormData(document.getElementById('category-form'));
+$('#submit-form').on('click', function() {
+    var formData = new FormData($('#category-form')[0]);
 
-  $.ajax({
-    url: '/create_category/', // Change the URL to your backend endpoint
-    method: 'POST',
-    data: formData,
-    processData: false,
-    contentType: false,
-    success: function(response) {
-      Swal.fire({
-        title: 'Success!',
-        text: response.message,
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 1500
-      }).then(() => {
-        window.location.href = '/categories/';// Redirect or do anything else after success
-      });
-    },
-    error: function(xhr, status, error) {
-      Swal.fire({
-        title: 'Error!',
-        text: 'An error occurred while creating the category.',
-        icon: 'error',
-        showConfirmButton: true
-      });
-    }
-  });
+    $.ajax({
+        url: '{% url "create_category" %}',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            Swal.fire({
+                title: 'Success!',
+                text: response.message,
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                window.location.href = '{% url "categories" %}'; // Redirect to categories page after success
+            });
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while creating the category.',
+                icon: 'error',
+                showConfirmButton: true
+            });
+        }
+    });
 });
 </script>
 {% endblock %}
