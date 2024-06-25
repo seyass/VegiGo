@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-x#5310onza%wtc++uzwix9xipji3j9bgt9p4a1pmtjjppwf*35
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['vegigo.shop','www.vegigo.shop','0.0.0.0','localhost']
 
 # Application definition
 
@@ -97,11 +97,11 @@ WSGI_APPLICATION = 'VegiGo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vegigo',
-        'HOST' :'localhost',#'vegigo.cpoggai6wuj9.eu-north-1.rds.amazonaws.com'
+        'NAME': 'vegigodb',
+        'HOST' :'vegigodb.cpoggai6wuj9.eu-north-1.rds.amazonaws.com',
         "PORT":'5432',
-        "USER":'postgres',# 'vegigosuperuser'
-        "PASSWORD":'Sre@8281' # 'Srey8281'
+        "USER":'postgres',
+        "PASSWORD":'Sree8281' 
     }
 }
 
