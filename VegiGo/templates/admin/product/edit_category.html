@@ -22,21 +22,44 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group">
-                    {{ form.name.label_tag }} {{ form.name }}
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.image.label_tag }} {{ form.image }}
+                    {{ form.image.label_tag }}
+                    {{ form.image }}
+                    {% if form.image.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.image.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
-                    {{ form.description.label_tag }} {{ form.description }}
+                    {{ form.description.label_tag }}
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.description.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
                 <button style="border-radius: .375rem;" type="submit" class="btn hvr-hover">Save changes</button>
             </form>
         </div>
     </div>
-    
-    
 </div>
+
 
 
 {% endblock %}

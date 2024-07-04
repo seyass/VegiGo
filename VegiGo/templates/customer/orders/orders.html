@@ -8,7 +8,7 @@
                <h2>My Account</h2>
                <ul class="breadcrumb">
                    <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Shop</a></li>
-                   <li class="breadcrumb-item"><a href="{% url 'user_profile' user.id %}">My account</a></li>
+                   <li class="breadcrumb-item"><a href="{% url 'user_profile' %}">My account</a></li>
                    <li class="breadcrumb-item active">Order</li>
                </ul>
            </div>
@@ -51,7 +51,8 @@
           <div class="card-footer py-2 text-muted" style="background-color: #06A245; display: flex; justify-content: space-between; align-items: center;">
             <a href="{% url 'order_detail' order.id %}" class="btn hvr-hover">More Details</a>
             {% if order.order_payment_status == 'pending' or order.order_payment_status == 'failed' %}
-            <a href="{% url 'failed_payment' order.id %}" class="btn hvr-hover">Pay now</a>
+            {% if order.total_price > 0 %}<a href="{% url 'failed_payment' order.id %}" class="btn hvr-hover">Pay now</a> {% endif %}
+            
             {% endif %}
           </div>
         </div>

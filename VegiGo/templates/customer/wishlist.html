@@ -7,7 +7,7 @@
                <h2>My Account</h2>
                <ul class="breadcrumb">
                    <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
-                   <li class="breadcrumb-item"><a href="{% url 'user_profile' user.id %}">My account</a></li>
+                   <li class="breadcrumb-item"><a href="{% url 'user_profile' %}">My account</a></li>
                    <li class="breadcrumb-item active">Wishlist</li>
                </ul>
            </div>
@@ -28,52 +28,49 @@
                 <p>{{ item.product.description }} </p>
                 <p><b>{{ item.product.selling_price }}</b><del>{{ item.product.price }}</del></p>
             </div>
-            <div >
-                    <!-- Dropdown menu links -->
-                    
-                    <a class="btn hvr-hover" type="POST" href="{% url 'add_to_cart_wishlist' item.product.id %}">Add to cart</i></a>
-                    <!-- Button trigger modal -->
-                    <button type="button" style="background-color: red;" class="btn hvr-hover" data-toggle="modal" data-target="#exampleModalCenter">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                    
-                    <!-- Modal -->
-                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div>
+                <a class="btn hvr-hover" type="POST" href="{% url 'add_to_cart_wishlist' item.product.id %}">Add to cart</a>
+                <!-- Button trigger modal -->
+                <button type="button" style="background-color: red;" class="btn hvr-hover" data-toggle="modal" data-target="#exampleModalCenter{{ item.id }}">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModalCenter{{ item.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle{{ item.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                                <h5 class="modal-title" id="exampleModalLongTitle{{ item.id }}">Delete Item</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
                             <div class="modal-body">
-                            <h1>Are you confirm to delete this address</h1>
+                                Are you sure you want to delete this item from your wishlist?
                             </div>
                             <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <a class="btn hvr-hover" style="background-color: red; margin-right: 5px;" href="{% url 'delete_wishlist' item.product.id %}">Confirm</a>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <a class="btn hvr-hover" style="background-color: red; margin-right: 5px;" href="{% url 'delete_wishlist' item.product.id %}">Confirm</a>
                             </div>
                         </div>
-                        </div>
                     </div>
-                    
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
     <div class="alert alert-info" role="alert">
-        There is no Items
-      </div>
-      {% endif %}
+        There are no items.
+    </div>
+    {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Check if there's a message passed from the server
     var msg = "{{ msg|escapejs }}";
-    
+
     if (msg) {
         // Show SweetAlert notification based on the message
         Swal.fire({
@@ -83,6 +80,5 @@
         });
     }
 </script>
-
 
 {% endblock %}

@@ -1,6 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
-from django.contrib import messages  # Import for displaying messages
+from django.contrib import messages
+from customer.models import CartItem  # Import for displaying messages
 from .models import Category, Product, SecondaryImage,Location,ProductLocations,CategoryOffer,ProductOffer
 from .forms import CategoryForm,ProductForm,ProductLocationForm,CategoryOfferForm,ProductOfferForm
 import os
@@ -11,6 +12,8 @@ from .forms import CategoryForm,ProductForm
 from django.db import IntegrityError
 from django.db.models import Sum
 from vgadmin import models as vgadmin_models
+from django import template
+register = template.Library()
 
 def admin_page(request):
     if 'isusername' in request.session:
@@ -29,6 +32,11 @@ def create_category(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
+            category_names = Category.objects.filter(is_active=True).values_list('name')
+            for name in category_names:
+                if form.cleaned_data['name'] in name:
+                    form.add_error('name','this product is already exist')
+                    return JsonResponse({'errors':form.errors},status = 400)
             form.save()
             return JsonResponse({'message': 'Category created successfully'})
         else:
@@ -49,6 +57,11 @@ def edit_category(request, catId):
     if request.method == 'POST':
         form = CategoryForm(request.POST, request.FILES, instance=category)
         if form.is_valid():
+            category_names = Category.objects.filter(is_active=True).values_list('name').exclude(id=category.id)
+            for name in category_names:
+                if form.cleaned_data['name'] in name:
+                    form.add_error('name','this product is already exist')
+                    return render(request,'admin/product/edit_category.html',{'form':form})
             form.save()
             return redirect(category_page)
         else:
@@ -56,17 +69,7 @@ def edit_category(request, catId):
     else:
         form = CategoryForm(instance=category)
         
-    return render(request, 'admin/product/edit_category.html', {'form': form, 'edit_mode': edit_mode})
-
-def delete_category(request, catId):
-    if 'isusername' not in request.session:
-        # Redirect if the user is not logged in
-        messages.error(request, "You need to sign in first.")
-        return redirect(signin_page)
-
-    category = Category.objects.get(pk=catId)
-    category.delete()
-    return redirect(category_page)
+    return render(request, 'admin/product/edit_category.html', {'form': form})
 
 def category_page(request):
 
@@ -74,25 +77,26 @@ def category_page(request):
         
         return redirect(signin_page)
 
-    categories = Category.objects.all().order_by('name')
+    categories = Category.objects.filter(is_active=True).order_by('name')
     return render(request, 'admin/product/categories.html', {'categories': categories})
 
-def update_category(request, category_id):
+def soft_delete_category(request, category_id):
     if 'isusername' not in request.session:
         # Redirect if the user is not logged in
         return redirect(signin_page)
 
     category = Category.objects.get(pk=category_id)
-    if request.method == 'POST':
-        new_status = request.POST.get('status')
-        if new_status == 'active':
-            category.is_active = True
-        elif new_status == 'blocked':
-            category.is_active = False
-        category.save()
-        return redirect(category_page)
-    else:
-        return redirect(category_page)
+    
+    category.is_active = False
+    products = Product.objects.filter(category=category)
+    for product in products:
+        product.is_active = False
+        cartitems = CartItem.objects.filter(product=product)
+        cartitems.delete()
+        product.save()
+    category.save()
+    return redirect(category_page)
+        
 
 @receiver(pre_delete, sender=Category)
 def delete_category_media(sender, instance, **kwargs):
@@ -172,13 +176,15 @@ def add_product(request):
         productLocationForm = ProductLocationForm()
     return render(request, 'admin/product/add_product.html', {'productForm':productForm,'productLocationForm':productLocationForm,'locations':locations,'categories':categories})
 
-def update_product(request, product_id):
+def soft_delete_product(request, product_id):
     if 'isusername' not in request.session:
         # Redirect if the user is not logged in
         return redirect(signin_page)
 
     product = Product.objects.get(pk=product_id)
     product.is_active = False
+    cart_items = CartItem.objects.filter(product=product)
+    cart_items.delete()
     product.save()
     return redirect(products_page)
     
@@ -199,12 +205,12 @@ def edit_product(request, product_id):
             price = productForm.cleaned_data['price']
             selling_price = productForm.cleaned_data['selling_price']
             discount = (float(price) - float(selling_price)) / float(price) * 100
-            product_names = Product.objects.filter(is_active=True).values_list('name')
+            product_names = Product.objects.filter(is_active=True).values_list('name').exclude(id=product_id)
             name = productForm.cleaned_data['name']
             for product_name in product_names:
                 if product_name[0].lower() == name.lower():
                     productForm.add_error('name','This product already exist')
-                    return render(request, 'admin/product/add_product.html', {'productForm': productForm, 'categories': categories,'locations':locations,'form':productForm,'product':product})
+                    return render(request, 'admin/product/edit_product.html', {'productForm': productForm, 'categories': categories,'locations':locations,'form':productForm,'product':product,'product_quantities':product_quantities})
             product.discount = discount
             product = productForm.save()
 
@@ -220,6 +226,8 @@ def edit_product(request, product_id):
                         ProductLocations.objects.create(product=product, location=location, quantity=int(quantity))
             for image in request.FILES.getlist('secondary_images'):
                     SecondaryImage.objects.create(product=product, image=image)
+            
+            return redirect('products')
         else:
             context = {
                 'productForm': productForm,
@@ -231,7 +239,7 @@ def edit_product(request, product_id):
             }
             return render(request, 'admin/product/edit_product.html', context)
             
-        return redirect('products')  # Assuming you have a product list view
+        
 
     else:
 
@@ -360,9 +368,16 @@ def edit_product_offer(request,offerId):
 
 def delete_product_offer(request,offerId):
 
+    if 'isusername' not in request.session:
+        return redirect('signin_page')
+
     offer = ProductOffer.objects.get(id=offerId)
     offer.delete()
     return redirect('offer_page')
     
 
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
 
+ 

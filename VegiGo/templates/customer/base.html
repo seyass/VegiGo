@@ -53,12 +53,9 @@
                     <div class="our-link">
                         <ul>
                             {% if user.is_authenticated %}
-                                <li><a href="{% url 'user_profile' user.id %}"><i class="fa fa-user s_color"></i> My Account</a></li>
-                            {% elif customer %}
-                                <!-- If user is not logged in, use customer.id -->
-                                <li><a href="{% url 'user_profile' customer.id %}"><i class="fa fa-user s_color"></i> My Account</a></li>
+                                <li><a href="{% url 'user_profile' %}"><i class="fa fa-user s_color"></i> My Account</a></li>
                             {% else %}
-                                <li><a href="{% url 'signin_page' %}"><i class="fa fa-user s_color"></i> My Account</a></li>
+                                <li><a href=""><i class="fa fa-user s_color"></i> My Account</a></li>
                             {% endif %}
                             <li><a href="#"><i class="fas fa-location-arrow"></i> Our location</a></li>
                             <li><a href="#"><i class="fas fa-headset"></i> Contact Us</a></li>
@@ -66,7 +63,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    {% if request.session.username or request.user.is_authenticated %}
+                    {% if request.user.is_authenticated %}
                         <!-- If user is logged in -->
                         <div class="login-box">
                             <a style="background-color: red;" class="btn hvr-hover" href="{% url 'logout_page' %}">Logout<i class="fa-solid fa-list"></i></a>
@@ -118,32 +115,24 @@
                                 <li><a href="{% url 'shop_page' %}">Products</a></li>
                                 {% if user.is_authenticated %}
                                     <li><a href="{% url 'cart_page' %}">Cart</a></li>
-                                {% elif customer %}
-                                    <!-- If user is not logged in, use customer.id -->
-                                    <li><a href="{% url 'cart_page' %}">Cart</a></li>
                                 {% else %}
                                 <li><a href="">Cart</a></li>
                                 {% endif %}
                                 {% if user.is_authenticated %}
-                                    <li><a href="{% url 'user_profile' user.id %}">My Account</a></li>
-                                {% elif customer %}
-                                    <!-- If user is not logged in, use customer.id -->
-                                    <li><a href="{% url 'user_profile' customer.id %}">My Account</a></li>
+                                    <li><a href="{% url 'user_profile' %}">My Account</a></li>
                                 {% else %}
                                 <li><a href="{% url 'signin_page' %}">My Account</a></li>
                                 {% endif %}
                                 {% if user.is_authenticated %}
                                     <li><a href="{% url 'orders_page' %}">Orders</a></li>
-                                {% elif customer %}
-                                    <!-- If user is not logged in, use customer.id -->
-                                    <li><a href="{% url 'orders_page' %}">Orders</a></li>
                                 {% else %}
                                 <li><a href="{% url 'signin_page' %}">Orders</a></li>
                                 {% endif %}
-                                
+                                {% if user.is_authenticated %}
                                 <li><a href="{% url 'wishlist_page' %}">Wishlist</a></li>
-                                
-                                
+                                {% else %}
+                                <li><a href="">Wishlist</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li class="nav-item"><a class="nav-link" href="">Contact Us</a></li>
@@ -234,21 +223,14 @@
                 <td class="button-cell"><a href="{% url 'home_page' %}">Home</a></td>
                </tr>
                <tr>{% if user.is_authenticated %}
-                    <td class="button-cell"><a href="{% url 'edit_profile' user.id %}">Edit Profile</a></td>
-                {% elif customer %}
-                    <!-- If user is not logged in, use customer.id -->
-                    <td class="button-cell"><a href="{% url 'edit_profile' customer.id %}">Edit Profile</a></td>
+                    <td class="button-cell"><a href="{% url 'edit_profile' %}">Edit Profile</a></td>
                 {% else %}
                 <td class="button-cell"><a href="{% url 'signin_page' %}">My Profile</a></td>
                 {% endif %}
                </tr>
                <tr>
                 {% if user.is_authenticated %}
-                    <td class="button-cell"><a href="{% url 'address_page' user.id %}">Address Book</a></td>
-                {% elif customer %}
-                    <!-- If user is not logged in, use customer.id -->
-                    <td class="button-cell"><a href="{% url 'address_page' customer.id %}">Address Book</a></td>
-
+                    <td class="button-cell"><a href="{% url 'address_page' %}">Address Book</a></td>
                 {% else %}
                 <td class="button-cell"><a href="{% url 'signin_page' %}">Address Book</a></td>
                 {% endif %}
@@ -262,26 +244,21 @@
                <tr>
                 {% if user.is_authenticated %}
                     <td class="button-cell"><a href="{% url 'cart_page' %}">Cart</a></td>
-                {% elif customer %}
-                    <!-- If user is not logged in, use customer.id -->
-                    <td class="button-cell"><a href="{% url 'cart_page' %}">Cart</a></td>
                 {% else %}
                 <td class="button-cell"><a href="">Cart</a></td>
                 {% endif %}
                </tr>
                <tr>
                 {% if user.is_google == False %}
-                <td class="button-cell"><a href="{% url 'edit_password' user.id %}">Edit password</a></td>
+                <td class="button-cell"><a href="{% url 'edit_password' %}">Edit password</a></td>
                 {% endif %}
                 </tr>
-       <tr>{% if user.is_authenticated %}
+       <tr>
+        {% if user.is_authenticated %}
         <td class="button-cell"><a href="{% url 'wallet_page' %}">Wallet</a></td>
-    {% elif customer %}
-        <!-- If user is not logged in, use customer.id -->
-        <td class="button-cell"><a href="{% url 'wallet_page' %}">Wallet</a></td>
-    {% else %}
-    <td class="button-cell"><a href="{% url 'signin_page' %}">Wallet</a></td>
-    {% endif %}
+        {% else %}
+        <td class="button-cell"><a href="{% url 'signin_page' %}">Wallet</a></td>
+        {% endif %}
 </tr>
                <tr>
                 <td class="button-cell"><a href="{% url 'logout_page' %}">Logout</a></td>

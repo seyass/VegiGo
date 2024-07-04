@@ -3,7 +3,19 @@
 {% block title %}
 User Orders - Admin Panel
 {% endblock %}
-
+{% block breadcrumb %}
+<div class="row mb-4 mt-2" style="height: 110px; background: linear-gradient(90deg, #4B4B4B, #2C3E50);">
+    <div class="col-lg-8 mt-5">
+     <h2 style="font-size: 28px;font-weight: 700;color: #ffffff;" class="ml-5"><b>Orders</b></h2>
+   </div>
+     <div class="col-lg-2 mt-4">
+       <ul class="breadcrumb" style="background-color: #06A245;">
+         <li class="breadcrumb-item"><a href="{% url 'admin_page' %}"><b>Admin</b></a></li>
+         <li style="color: rgb(187, 186, 183);" class="breadcrumb-item active"><b>Orders</b></li>
+     </ul>
+    </div>
+</div>
+{% endblock %}
 {% block content %}
 <div class="container mt-4" id="order-container">
     {% for order in orders %}
@@ -46,7 +58,7 @@ User Orders - Admin Panel
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function(){
-        const itemsPerPage = 5;
+        const itemsPerPage = 4;
         const $orderContainer = $('#order-container');
         const $paginationControls = $('#pagination-controls');
         const $orderCards = $('.order-card');

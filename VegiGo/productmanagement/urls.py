@@ -8,17 +8,15 @@ urlpatterns = [
     ### admin product management
     path('vgadmin/products/',views.products_page,name='products'),
     path('vgadmin/product/add',views.add_product,name='add_product'),
-    path('vgadmin/product/update/<int:product_id>/', views.update_product, name='update_product'),
     path('vgadmin/product/edit/<int:product_id>/',views.edit_product,name='edit_product'),
     path('vgadmin/product/edit/<int:product_id>/delete-secondary/<int:secondary_image_id>/', views.delete_secondary_image, name='delete_secondary_image'),
-    path('vgadmin/product/delete/<int:product_id>/',views.update_product,name='delete_product'),
+    path('vgadmin/product/delete/<int:product_id>/',views.soft_delete_product,name='delete_product'),
 
     ### admin category management
     path('vgadmin/categories/',views.category_page,name='categories'),
     path('vgadmin/category/add/',views.create_category,name='create_category'),
     path('vgadmin/category/edit/<int:catId>/',views.edit_category,name='edit_category'),
-    path('vgadmin/category/delete/<int:catId>/',views.delete_category,name='deleteCategory'),
-    path('vgadmin/category/update/<int:category_id>/', views.update_category, name='update_category'),
+    path('vgadmin/category/update/<int:category_id>/', views.soft_delete_category, name='delete_category'),
     
     ### admin offer management
     path('vgadmin/offer',views.offer_page,name='offer_page'),

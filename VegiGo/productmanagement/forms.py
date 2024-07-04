@@ -99,6 +99,10 @@ class CategoryOfferForm(forms.ModelForm):
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.filter(is_active=True)
+
     def clean_discount(self):
         discount = self.cleaned_data.get('discount')
         if discount < 1:
@@ -137,6 +141,11 @@ class ProductOfferForm(forms.ModelForm):
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['product'].queryset = Product.objects.filter(is_active=True)
+
+
     def clean_discount(self):
         discount = self.cleaned_data.get('discount')
         if discount < 1:

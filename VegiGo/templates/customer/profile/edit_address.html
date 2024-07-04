@@ -13,15 +13,11 @@
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
                     <li class="breadcrumb-item active">{% if user.is_authenticated %}
-                        <a href="{% url 'user_profile' user.id %}"> My Account</a>
-                    {% elif customer %}
-                        <a href="{% url 'user_profile' customer.id %}"> My Account</a>
+                        <a href="{% url 'user_profile' %}"> My Account</a>
                     {% endif %}</li>
                     <li class="breadcrumb-item active" >
                         {% if user.is_authenticated %}
-                        <a href="{% url 'address_page' user.id %}"> Address</a>
-                    {% elif customer %}
-                        <a href="{% url 'address_page' customer.id %}">Address</a>
+                        <a href="{% url 'address_page' %}"> Address</a>
                     {% endif %}
                     </li>
                     <li class="breadcrumb-item active">Edit Address</li>

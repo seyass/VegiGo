@@ -30,14 +30,14 @@
           <BR></BR>
           <h4><b>ACCOUNT INFORMATION</b></h4>
           <table class="table">
-            <thead>
+            <thead style="background-color: #7755A2; color: white;">
               <tr>
                 <td scope="col">Contact  Information</td>
                 <td scope="col">Default Address</td>
               </tr>
              </thead>
             <tbody>
-              <tr>
+              <tr class="table-success">
                 <td><p>{{customer.first_name}} {{customer.last_name}}</p>
                     <p>{{ customer.username }},</p>
                     <p>{{ customer.email }}</p>
@@ -63,9 +63,6 @@
                                 <div class="service-icon">
                                     {% if user.is_authenticated %}
                                     <a href="{% url 'orders_page' %}"> <i class="fa fa-gift"></i> </a>
-                                    {% elif customer %}
-                                        <!-- If user is not logged in, use customer.id -->
-                                        <a href="{% url 'orders_page' %}"> <i class="fa fa-gift"></i> </a>
                                     {% else %}
                                     <a href="#"> <i class="fa fa-gift"></i> </a>
                                     {% endif %}
@@ -83,10 +80,8 @@
                             <div class="service-box">
                                 <div class="service-icon">
                                     {% if user.is_authenticated %}
-                                        <a href="{% url 'edit_profile' user.id %}"><i class="fa fa-lock"></i></a>
-                                    {% elif customer %}
-                                        <!-- If user is not logged in, use customer.id -->
-                                        <a href="{% url 'edit_profile' customer.id %}"><i class="fa fa-lock"></i></a>
+                                        <a href="{% url 'edit_profile' %}"><i class="fa fa-lock"></i></a>
+                                    
                                     {% else %}
                                         <a href=""><i class="fa fa-user s_color"></i> My Account</a>
                                     {% endif %}
@@ -103,9 +98,8 @@
                             <div class="service-box">
                                 <div class="service-icon">
                                     {% if user.is_authenticated %}
-                                        <a href="{% url 'address_page' user.id %}"> <i class="fa fa-location-arrow"></i></a>
-                                    {% elif customer %}
-                                        <a href="{% url 'address_page' customer.id %}"> <i class="fa fa-location-arrow"></i></a>
+                                        <a href="{% url 'address_page' %}"> <i class="fa fa-location-arrow"></i></a>
+                                    
                                     {% endif %}</li>
                                 </div>
                                 <div class="service-desc">

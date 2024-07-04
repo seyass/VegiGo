@@ -67,10 +67,7 @@
                     <div class="our-link">
                         <ul>
                             {% if user.is_authenticated %}
-                                <li><a href="{% url 'user_profile' user.id %}"><i class="fa fa-user s_color"></i> My Account</a></li>
-                            {% elif customer %}
-                                <!-- If user is not logged in, use customer.id -->
-                                <li><a href="{% url 'user_profile' customer.id %}"><i class="fa fa-user s_color"></i> My Account</a></li>
+                                <li><a href="{% url 'user_profile' %}"><i class="fa fa-user s_color"></i> My Account</a></li>
                             {% else %}
                                 <li><a href=""><i class="fa fa-user s_color"></i> My Account</a></li>
                             {% endif %}
@@ -80,7 +77,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    {% if request.session.username or request.user.is_authenticated %}
+                    {% if request.user.is_authenticated %}
                         <!-- If user is logged in -->
                         <div class="login-box">
                             <a style="background-color: red;" class="btn hvr-hover" href="{% url 'logout_page' %}">Logout<i class="fa-solid fa-list"></i></a>
@@ -132,29 +129,25 @@
                                 <li><a href="{% url 'shop_page' %}">Products</a></li>
                                 {% if user.is_authenticated %}
                                     <li><a href="{% url 'cart_page' %}">Cart</a></li>
-                                {% elif customer %}
-                                    <!-- If user is not logged in, use customer.id -->
-                                    <li><a href="{% url 'cart_page' %}">Cart</a></li>
                                 {% else %}
                                 <li><a href="">Cart</a></li>
                                 {% endif %}
                                 {% if user.is_authenticated %}
-                                    <li><a href="{% url 'user_profile' user.id %}">My Account</a></li>
-                                {% elif customer %}
-                                    <!-- If user is not logged in, use customer.id -->
-                                    <li><a href="{% url 'user_profile' customer.id %}">My Account</a></li>
+                                    <li><a href="{% url 'user_profile' %}">My Account</a></li>
                                 {% else %}
                                 <li><a href="{% url 'signin_page' %}">My Account</a></li>
                                 {% endif %}
                                 {% if user.is_authenticated %}
                                     <li><a href="{% url 'orders_page' %}">Orders</a></li>
-                                {% elif customer %}
-                                    <!-- If user is not logged in, use customer.id -->
-                                    <li><a href="{% url 'orders_page' %}">Orders</a></li>
+                
                                 {% else %}
                                 <li><a href="{% url 'signin_page' %}">Orders</a></li>
                                 {% endif %}
-                                <li><a href="{% url 'wishlist_page' %}">Wishlist</a></li>
+                                {% if user.is_authenticated %}
+                                    <li><a href="{% url 'wishlist_page' %}">Wishlist</a></li>
+                                {% else %}
+                                <li><a href="">Wishlist</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li class="nav-item"><a class="nav-link" href="">Contact Us</a></li>
@@ -364,24 +357,6 @@
     </div>
 </div>
 <!-- End Products  -->
-
-
-   
-
-<!-- 
-   <div class="instagram-box">
-        <div class="main-instagram owl-carousel owl-theme">
-            <div class="item">
-                <div class="ins-inner-box">
-                    <img src="images/instagram-img-01.jpg" alt="" />
-                    <div class="hov-in">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- End Instagram Feed  --> 
     {% endblock %}
 
     <!-- Start Footer  -->

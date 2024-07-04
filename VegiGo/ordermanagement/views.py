@@ -1,6 +1,6 @@
-from datetime import timedelta, timezone
+
 from django.shortcuts import render,redirect
-from customer.models import Cart,CartItem,UserAddress,Wallet
+from customer.models import CartItem,UserAddress,Wallet
 from ordermanagement import models as Orders
 from productmanagement import models as Products
 from django.http import JsonResponse
@@ -13,7 +13,6 @@ from customer.views import cart_page
 from .models import Order,OrderItem
 from vgadmin.models import Coupon
 import json
-from django.db.models import Sum, F
 from vgadmin.models import Branches
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -52,7 +51,7 @@ def generate_invoice(order):
     c.drawString(address_x, height - 100, "Shipping Address:")
     c.drawString(address_x, height - 120, f"{order.address_info['street_address']}")
     c.drawString(address_x, height - 140, f"{order.address_info['city']}")
-    c.drawString(address_x, height - 160, f"{order.address_info['state']}, {order.address_info['pincode']} {order.address_info['landmak']}")
+    c.drawString(address_x, height - 160, f"{order.address_info['district']}, {order.address_info['pincode']} {order.address_info['landmak']}")
     c.drawString(address_x, height - 180, f"{order.address_info['phone_number']}")
     # Table Header
     c.setFont("Helvetica-Bold", 12)
@@ -197,8 +196,8 @@ def place_order(request):
                     price=cart_item.product.special_discount,  # or use cart_item.product.selling_price if applicable
                     image = cart_item.product.primary_image,
                     quantity=cart_item.quantity,
-                    status='completed',
-                    payment_status='pending',
+                    status='pending',
+                    payment_status='failed',
                     discount=cart_item.product.max_discount
                 )
                 product = Products.ProductLocations.objects.filter(product=cart_item.product,location=selected_address.district.id)
@@ -376,7 +375,6 @@ def user_order_cancel(request,orderItemId):
     if request.user.is_authenticated or 'username' in request.session:
         
         order = Orders.OrderItem.objects.get(id=orderItemId)
-        print(order.status)
         main_order = Order.objects.get(id=order.order.id)
         if order.status == 'Cancelled':
             return redirect('orders_page')
@@ -409,13 +407,14 @@ def user_order_cancel(request,orderItemId):
             wallet.amount += amount
             wallet.save()
         order.status = 'cancelled'
+        item_total = order.subtotal()
+        order.order.total_price = order.order.total_price - item_total
+        order.order.save()
         order.user_cancel = True
         order.payment_status = 'Completed'
-        location_name = order.order.address_info.get('state')
-        print(location_name)
+        location_name = order.order.address_info.get('district')
         location = Branches.objects.get(name=location_name)
-        product_name = order.product.get('product')
-        product = Products.Product.objects.get(name=product_name)
+        product = order.key_product
         product = Products.ProductLocations.objects.filter(product=product,location=location)
         for i in product:
             i.quantity = i.quantity + order.quantity
@@ -467,9 +466,12 @@ def update_order_status(request):
 
     if request.user.is_authenticated or 'username' in request.session:
         if request.method == 'POST':
+            
             order_item_id = request.POST.get('order_item_id')
             new_status = request.POST.get('new_status')
-            
+            order_item = OrderItem.objects.get(id=order_item_id)
+            if order_item.status == 'cancelled' or order_item.status == 'returned' or order_item.status == 'delivered':
+                return JsonResponse({'error': 'Invalid request method'}, status=400)
             if new_status == 'returned':
                 order_item = OrderItem.objects.get(id=order_item_id)
                 order_item.status = 'returned'
@@ -479,11 +481,10 @@ def update_order_status(request):
                 wallet.save()
                 location_name = order_item.order.address_info.get('district')
                 location = Branches.objects.get(name=location_name)
-                product_name = order_item.product.get('product')
-                product = Products.Product.objects.get(name=product_name)
+                product = order_item.key_product
                 product = Products.ProductLocations.objects.filter(product=product,location=location)
                 for i in product:
-                    i.quantity = i.quantity + order.quantity
+                    i.quantity = i.quantity + order_item.quantity
                     i.save()
             elif new_status == 'cancelled':
                 order = OrderItem.objects.get(id=order_item_id)
@@ -518,14 +519,25 @@ def update_order_status(request):
                 order.payment_status = 'Completed'
                 location_name = order.order.address_info.get('district')
                 location = Branches.objects.get(name=location_name)
-                product_name = order.product.get('product')
-                product = Products.Product.objects.get(name=product_name)
+                product = order_item.key_product
                 product = Products.ProductLocations.objects.filter(product=product,location=location)
                 for i in product:
                     i.quantity = i.quantity + order.quantity
                     i.save()   
                 order.save()
-        
+            elif new_status == 'delivered':
+                order = OrderItem.objects.get(id=order_item_id)
+                if order.order.payment_method == 'cod':
+                    order = OrderItem.objects.get(id=order_item_id)
+                    item_total = order.subtotal()
+                    order.status = 'delivered'
+                    order.order.total_price = order.order.total_price - item_total
+                    order.order.save()
+                    if order.order.total_price <= 0:
+                        order.order.total_price = 0
+                        order.order.order_payment_status = 'completed'
+                        order.order.save()
+                    
             try:
                 order_item = Orders.OrderItem.objects.get(id=order_item_id)
                 order_item.status = new_status
@@ -629,11 +641,13 @@ def verify_payment(request):
         return redirect('signin_page')
 
 def download_invoice(request, orderId):
-    order = Order.objects.get(id=orderId)
-    buffer = generate_invoice(order)
 
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
-    return response
+    if request.user.is_authenticated:
+        order = Order.objects.get(id=orderId)
+        buffer = generate_invoice(order)
+
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="invoice_{order.id}.pdf"'
+        return response
 
 

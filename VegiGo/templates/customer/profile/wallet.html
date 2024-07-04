@@ -10,7 +10,7 @@
               <h2>My Account</h2>
               <ul class="breadcrumb">
                   <li class="breadcrumb-item"><a href="{% url 'home_page' %}">Home</a></li>
-                  <li class="breadcrumb-item"><a href="{% url 'user_profile' user.id %}">My Account</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'user_profile' %}">My Account</a></li>
                   <li class="breadcrumb-item active">Wallet</li>
               </ul>
           </div>
@@ -23,7 +23,7 @@
 <div class="container mt-4">
     <h1 class="text-center">Wallet</h1>
     <div class="card mb-3 border-0" style="box-shadow: 5px 5px 10px #888888;">
-        <div class="card-header py-2" style="background-color: #7755A2; color: white;">
+        <div class="card-header py-2" style="background: linear-gradient(90deg, #4B4B4B, #2C3E50); color: white;">
           <p>Hi {{ wallet.user.first_name }} {{ wallet.user.last_name }}</p>
           <p>User: {{ wallet.user.username }}</p>
             Wallet Balance: {{ wallet.amount }}
@@ -31,9 +31,9 @@
         <div class="card-body py-2">
             <div class="card-footer text-muted">
                 <h4><b>Wallet History</b></h4>
-                <table class="table mx-auto">
-                    <thead>
-                        <tr style="color: rgb(248, 225, 225);">
+                <table class="table">
+                    <thead style="background-color: #7755A2; color: white;">
+                        <tr>
                             <th scope="col">#</th>
                             <th scope="col">Date</th>
                             <th scope="col">Amount</th>
@@ -42,9 +42,9 @@
                     </thead>
                     <tbody id="wallet-history-body">
                         {% for item in wallet_history %}
-                        <tr style="color: wheat;">
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ item.timestamp|date:"d/m/Y H:i" }}</td>
+                        <tr class="table-success">
+                            <td style="color: black;">{{ forloop.counter }}</td>
+                            <td style="color: black;">{{ item.timestamp|date:"d/m/Y H:i" }}</td>
 
                               {% if item.transaction_type == 'credit' %}
                               <td style="color: green;">+{{ item.amount }}</td>
@@ -52,7 +52,7 @@
                               <td style="color: red;">-{{ item.amount }}</td>
                               {% endif %}
                             
-                            <td>{{ item.transaction_type }}</td>
+                            <td style="color: black;">{{ item.transaction_type }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

@@ -18,20 +18,21 @@
 {% endblock %}
 {% block content %}
 
-  <div class="container">
-    <table class="table">
+<div class="container">
+  <table class="table">
     <thead style="background-color: #7755A2; color: white;">
-        <th scope="col">Coupon </th>
-        <th scope="col">discount amount</th>
-        <th scope="col">start date</th>
-        <th scope="col">end date</th>
-        <th scope="col">minimum amount</th>
+      <tr>
+        <th scope="col">Coupon</th>
+        <th scope="col">Discount Amount</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Minimum Amount</th>
         <th scope="col">Action</th>
       </tr>
     </thead>
-    <tbody>
-        {% for item in coupons %}
-      <tr class="table-success">
+    <tbody id="coupons-table-body">
+      {% for item in coupons %}
+      <tr class="table-success coupon-row">
         <td>{{ item.code }}</td>
         <td>{{ item.discount_amount }}</td>
         <td>{{ item.start_date }}</td>
@@ -45,10 +46,53 @@
       {% endfor %}
     </tbody>
   </table>
-  </div>
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center" id="coupons-pagination">
+    </ul>
+  </nav>
+</div>
 
+<script>
+  function setupPagination(rows, rowsPerPage, paginationElement, displayRowsFunction) {
+    paginationElement.innerHTML = '';
+    const pageCount = Math.ceil(rows.length / rowsPerPage);
 
+    for (let i = 1; i <= pageCount; i++) {
+      const btn = paginationButton(i, rows, displayRowsFunction);
+      paginationElement.appendChild(btn);
+    }
+  }
 
+  function paginationButton(page, rows, displayRowsFunction) {
+    const button = document.createElement('li');
+    button.classList.add('page-item');
+    button.innerHTML = `<a class="page-link" href="#">${page}</a>`;
+
+    button.addEventListener('click', () => {
+      currentPage = page;
+      displayRowsFunction((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+      document.querySelectorAll('.page-item').forEach(item => item.classList.remove('active'));
+      button.classList.add('active');
+    });
+
+    return button;
+  }
+
+  function displayRows(startIndex, endIndex, rows) {
+    rows.forEach((row, index) => {
+      row.style.display = (index >= startIndex && index < endIndex) ? '' : 'none';
+    });
+  }
+
+  const rowsPerPage = 7; // Number of rows to display per page
+
+  // Coupons pagination
+  const couponRows = document.querySelectorAll('#coupons-table-body .coupon-row');
+  const couponsPaginationElement = document.getElementById('coupons-pagination');
+  let currentCouponPage = 1;
+  displayRows(0, rowsPerPage, couponRows);
+  setupPagination(couponRows, rowsPerPage, couponsPaginationElement, (startIndex, endIndex) => displayRows(startIndex, endIndex, couponRows));
+  document.querySelectorAll('#coupons-pagination .page-item')[0].classList.add('active');
+</script>
 
 {% endblock %}
-

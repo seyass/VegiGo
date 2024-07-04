@@ -30,7 +30,7 @@
                     <h1>Address & payment</h1>
                     <hr class="mb-4">
                     {% if cartId %}
-                    <a href="{% url 'address_page' customer.id %}?return_url=checkout_page"><h3>Add address</h3></a>
+                    <a href="{% url 'address_page' %}?return_url=checkout_page"><h3>Add address</h3></a>
                     {% endif %}
                     {% for address in addresses %}
                     <div class="">

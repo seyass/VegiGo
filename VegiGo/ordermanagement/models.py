@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models ,transaction
 from customer.models import vgUser,UserAddress
 from productmanagement.models import Product
