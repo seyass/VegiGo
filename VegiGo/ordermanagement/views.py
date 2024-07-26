@@ -157,8 +157,7 @@ def place_order(request):
             items = cart.items.all()
             cart.calculate_total_price()
             cart.save()
-            # Payment verification successful
-            # Retrieve the order from your database
+            
             address_data = {
                 'firstname':selected_address.firstname,
                 'lastname':selected_address.lastname,
@@ -218,7 +217,6 @@ def place_order(request):
                 msg = "The wallet not have much balance"
                 return render(request,'404.html',{'msg':msg})
             else:
-                
                 wallet = Wallet.objects.get(user=request.user)
                 wallet.previous_balance = wallet.amount
                 wallet.amount -= cart.sub_total
@@ -274,7 +272,6 @@ def place_order(request):
                     order_payment_status = 'pending'
                 )
             except Exception as e:
-                print(e)
                 return render(request,'404.html')
             if cart.select_coupon:
                 order.coupon_code = cart.select_coupon.code
@@ -293,7 +290,7 @@ def place_order(request):
                     price=cart_item.product.special_discount,  # or use cart_item.product.selling_price if applicable
                     image = cart_item.product.primary_image,
                     quantity=cart_item.quantity,
-                    status='completed',
+                    status='pending',
                     payment_status='pending',
                     discount=cart_item.product.max_discount
                 )
@@ -419,7 +416,6 @@ def user_order_cancel(request,orderItemId):
         for i in product:
             i.quantity = i.quantity + order.quantity
             i.save()
-            
         order.save()
         return redirect('orders_page')
     else:
@@ -466,7 +462,6 @@ def update_order_status(request):
 
     if request.user.is_authenticated or 'username' in request.session:
         if request.method == 'POST':
-            
             order_item_id = request.POST.get('order_item_id')
             new_status = request.POST.get('new_status')
             order_item = OrderItem.objects.get(id=order_item_id)

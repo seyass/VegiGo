@@ -3,64 +3,44 @@
 from django.utils import timezone
 from django.shortcuts import render,redirect
 from django.urls import reverse
-from home import models
 from home.views import home_page,check_offer
 from authentication.models import vgUser
 from vgadmin.models import Branches,Coupon
-from .forms import UserProfileForm , AddressForm, CartForm,CartItemForm
+from .forms import UserProfileForm , AddressForm
 from .models import Cart,CartItem,UserAddress,Wallet,WalletHistory
 from django.core.exceptions import ObjectDoesNotExist
 from productmanagement.models import Product,ProductLocations
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect, JsonResponse
-import json
-from django.core import serializers
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.defaulttags import register
 from ordermanagement import models as Orders
 from django.contrib.auth import authenticate,login
-from django.db.models import Sum,Max
 from .models import Wishlist,WishlistItem
-from django.views.decorators.http import require_POST
-from django.db.models import F, Max, Case, When, Value
+
 
 ####################### user profile #######################
 
-def user_profile(request,userId):
-    if userId is None:
-        return redirect(home_page)
+def user_profile(request):
     
-    if request.user.is_authenticated or 'username' in request.session:
-        print('hooi')
+    if request.user.is_authenticated:
         try:
             customer = request.user
             return render(request,'customer/profile/profile.html',{'customer':customer})
-        
         except:
             return render(request,'404.html')
     else:
         return redirect('signin_page')
 
-def edit_profile(request,userId):
+def edit_profile(request):
 
-    if request.user.is_authenticated or 'username' in request.session:
-        customer = vgUser.objects.get(pk=userId)
+    if request.user.is_authenticated:
+        customer = request.user
         if customer.is_superuser is False:
             if request.method == 'POST':
-
                 form = UserProfileForm(request.POST, instance=request.user)
                 if form.is_valid():
-                    first_name = form.cleaned_data['first_name'].strip()
-                    last_name = form.cleaned_data['last_name'].strip()
-                    
-                    if len(first_name) == 0:
-                        form.add_error('first_name','This field is required')
-                        return render(request, 'customer/profile/edit_profile.html', {'form': form,'customer':customer})
-                    if len(last_name) == 0:
-                        form.add_error('last_name','This field is required')
-                        return render(request, 'customer/profile/edit_profile.html', {'form': form,'customer':customer})
-
                     form.save()
-                    return redirect('user_profile',userId)  
+                    return redirect('user_profile')  
                 else:
                     return render(request, 'customer/profile/edit_profile.html', {'form': form,'customer':customer})# Redirect to profile page after successful form submission
             else:
@@ -72,12 +52,12 @@ def edit_profile(request,userId):
     else:
         return render(request,'404.html')
 
-def edit_password(request,userId):
+def edit_password(request):
 
-    if 'username' in request.session:
+    if request.user.is_authenticated:
         
         msg = None
-        user = vgUser.objects.get(pk=userId)
+        user = request.user
         if request.method == 'POST':
             old_password = request.POST.get('oldpassword')
             new_password = request.POST.get('newpassword')
@@ -93,22 +73,21 @@ def edit_password(request,userId):
                 authenticated_user = authenticate(username=user.username, password=new_password)
                 if authenticated_user:    
                     login(request, authenticated_user, backend=authenticated_user.backend)
-                    request.session['username'] = user.username
-                    return redirect('user_profile',userId)
+                    return redirect('user_profile')
                 else:
                     return redirect('signin_page')  
             else:
                 msg = 'The password old_password  is incorrect.'
                 return render(request,'customer/profile/edit_password.html',{'msg':msg})
         return render(request,'customer/profile/edit_password.html',{'msg':msg})
-    return redirect('user_profile',userId)  
+    return redirect('user_profile')  
     
 #######################  address ####################### 
 
-def address_page(request, userId):
+def address_page(request):
 
-    if request.user.is_authenticated or 'username' in request.session:
-        user = vgUser.objects.get(pk=userId) 
+    if request.user.is_authenticated:
+        user = request.user 
         addresses = UserAddress.objects.filter(user=user)
         userAddress = addresses.exists()
         print(userAddress)
@@ -123,7 +102,7 @@ def address_page(request, userId):
                     return redirect('checkout_page',request.user.cart.id)
                 else:
                     form = AddressForm()
-                    return redirect(reverse('address_page', kwargs={'userId': userId}))
+                    return redirect(reverse('address_page'))
             else:
                 form = AddressForm()
                 return render(request,'customer/profile/address.html',{'userAddress':userAddress,'addresses':addresses,'form':form})
@@ -136,23 +115,17 @@ def address_page(request, userId):
 
 def edit_address(request, addressId):
 
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
     
         address = UserAddress.objects.get(pk=addressId)
-        userId = address.user.id
-        addresses = UserAddress.objects.filter(user=vgUser.objects.get(pk=userId)).order_by("-address_type")
+        addresses = UserAddress.objects.filter(user=request.user).order_by("-address_type")
         userAddress = addresses.exists() 
         if request.method == "POST":
             form = AddressForm(request.POST, instance=address)
             
             if form.is_valid():
-                phone_number = set(form.cleaned_data['phone_number'])
-                te = {'0'}
-                if phone_number == te:
-                        form.add_error('phone_number','enter a valid number')
-                        return render(request,'customer/profile/edit_address.html',{'userAddress':address,'addresses':addresses,'form':form})
                 form.save()  # Save the changes to the address
-                return redirect('address_page',userId=userId)  
+                return redirect('address_page')  
             else:
                 return render(request, "customer/profile/edit_address.html", {'form': form,'addresses':addresses,'userAddress':userAddress}) # Redirect to address detail page
         else:
@@ -169,16 +142,13 @@ def edit_address(request, addressId):
 
 def delete_address(request,addressId):
 
-    if request.user.is_authenticated or 'username' in request.session:
-        addresses = None
+    if request.user.is_authenticated:
         try:
             address = UserAddress.objects.get(id=addressId)
-            userId = address.user.id
-            addresses = UserAddress.objects.filter(user=vgUser.objects.get(pk=userId)).order_by("-address_type") 
             address.delete()
         except:
             pass
-        return redirect('address_page',request.user.id)
+        return redirect('address_page')
     else:
         return redirect('signin_page')
 
@@ -400,9 +370,13 @@ def update_cart_location(request):
 
 def checkout_page(request,cartId):
 
-    cart = Cart.objects.get(id=cartId)
-    items = cart.items.all()
-    now = timezone.now()
+    try:
+        cart = request.user.cart
+        items = cart.items.all()
+        now = timezone.now()
+    except:
+        cart = None
+        items = None
     try:
         available_coupons = Coupon.objects.filter(
         minimum_purchase__lte=cart.sub_total,
@@ -433,10 +407,10 @@ def checkout_page(request,cartId):
     if cartId is False:
         return render(request,'authenication/signin.html')
 
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
         
         try:
-            cart = Cart.objects.get(id=cartId)
+            
             items = cart.items.all()
             if cart.location:
                 for item in items:
@@ -483,41 +457,45 @@ def checkout_page(request,cartId):
 
 @csrf_exempt
 def apply_coupon(request):
-    if request.method == 'POST':
-        code = request.POST.get('coupon_code')
-        user = request.user
-        coupon = Coupon.objects.get(code=code)
-        if coupon.end_date < timezone.now().date() or coupon.start_date > timezone.now().date():
-            return JsonResponse({'error':'This coupon out of date range'})
-        try:
-            usedCoupon = Coupon.objects.filter(used_by_users=user)
-            if coupon in usedCoupon:
-                return JsonResponse({'error':'already used this coupon'})
-        except:
-            pass
-        cart = Cart.objects.get(user=user)
-        if cart.select_coupon:
-            return JsonResponse({'error':'Already use one coupon'})
-        sub_total = cart.sub_total
-        items = cart.items.all()
-        if coupon:
-            for item in items:
-                if item.total_price < coupon.discount_amount:
-                    error_message = f"The  total purchase amount does not meet the minimum required of {coupon.discount_amount}."
+    if request.user.is_authenticated:
+
+        if request.method == 'POST':
+            code = request.POST.get('coupon_code')
+            user = request.user
+            coupon = Coupon.objects.get(code=code)
+            if coupon.end_date < timezone.now().date() or coupon.start_date > timezone.now().date():
+                return JsonResponse({'error':'This coupon out of date range'})
+            try:
+                usedCoupon = Coupon.objects.filter(used_by_users=user)
+                if coupon in usedCoupon:
+                    return JsonResponse({'error':'already used this coupon'})
+            except:
+                pass
+            cart = Cart.objects.get(user=user)
+            if cart.select_coupon:
+                return JsonResponse({'error':'Already use one coupon'})
+            sub_total = cart.sub_total
+            items = cart.items.all()
+            if coupon:
+                for item in items:
+                    if item.total_price < coupon.discount_amount:
+                        error_message = f"The  total purchase amount does not meet the minimum required of {coupon.discount_amount}."
+                        return JsonResponse({'error':error_message})
+                
+                if coupon.minimum_purchase > sub_total:
+                    error_message = f"The  total purchase amount does not meet the minimum required of {coupon.minimum_purchase}."
                     return JsonResponse({'error':error_message})
             
-            if coupon.minimum_purchase > sub_total:
-                error_message = f"The  total purchase amount does not meet the minimum required of {coupon.minimum_purchase}."
-                return JsonResponse({'error':error_message})
-        
-        cart.select_coupon = coupon
-        cart.calculate_total_price()
-        cart.save()
-        return JsonResponse({'success':True})
+            cart.select_coupon = coupon
+            cart.calculate_total_price()
+            cart.save()
+            return JsonResponse({'success':True})
+    else:
+        return redirect('signin_page')
 
 def remove_coupon(request):
     
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
         user = request.user
         cart = Cart.objects.get(user=user)
         cart.select_coupon = None
@@ -528,7 +506,7 @@ def remove_coupon(request):
 
 def orders_page(request):
 
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
 
         orders = Orders.Order.objects.filter(user=request.user).order_by('-created_at')
         return render(request, 'customer/orders/orders.html',{'orders':orders})
@@ -537,7 +515,7 @@ def orders_page(request):
 
 def order_detail(request,orderId):
 
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
 
         order = Orders.Order.objects.get(id=orderId)
         items = Orders.OrderItem.objects.filter(order=order)
@@ -548,7 +526,7 @@ def order_detail(request,orderId):
 
 def wishlist_page(request):
 
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
         
         user = None
         if request.user.is_authenticated:
@@ -570,7 +548,7 @@ def wishlist_page(request):
         return redirect('signin_page')
 
 def add_wishlist(request, productId):
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
         user = None
         if request.user.is_authenticated:
             user = request.user
@@ -612,7 +590,7 @@ def add_wishlist(request, productId):
 
 def delete_wishlist(request,productId):
 
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
         user = None
         if request.user.is_authenticated:
             user = request.user
@@ -628,7 +606,7 @@ def delete_wishlist(request,productId):
 
 def wallet_page(request):
     user = None
-    if request.user.is_authenticated or 'username' in request.session:
+    if request.user.is_authenticated:
         
         user = request.user
         try:

@@ -26,7 +26,7 @@
                 <img src="{{ item.product.primary_image.url }}" style="height: 75px; width: 75px;" alt="">
                 <p>Name: <b>{{ item.product.name }}</b> </p>
                 <p>{{ item.product.description }} </p>
-                <p><b>{{ item.product.selling_price }}</b><del>{{ item.product.price }}</del></p>
+                <p><b>{{ item.product.special_discount }}</b><del>{{ item.product.price }}</del></p>
             </div>
             <div>
                 <a class="btn hvr-hover" type="POST" href="{% url 'add_to_cart_wishlist' item.product.id %}">Add to cart</a>

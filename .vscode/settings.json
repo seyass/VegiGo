@@ -1,0 +1,7 @@
+{
+    "editor.fontFamily": "jet brains",
+    "python.autoComplete.extraPaths": [
+        
+    ],
+    "python.analysis.extraPaths": []
+}

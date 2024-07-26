@@ -4,9 +4,9 @@ from . import views
 
 urlpatterns = [
     # profile
-    path('user/profile/<int:userId>/',views.user_profile,name='user_profile'),
-    path('user/profile/edit/<int:userId>/',views.edit_profile,name='edit_profile'),
-    path('user/profile/edit/password/<int:userId>/',views.edit_password,name='edit_password'),
+    path('user/profile/',views.user_profile,name='user_profile'),
+    path('user/profile/edit/',views.edit_profile,name='edit_profile'),
+    path('user/profile/edit/password/',views.edit_password,name='edit_password'),
 
     # user cart
     path('cart/',views.cart_page,name='cart_page'),
@@ -16,7 +16,7 @@ urlpatterns = [
     path('cart/update/location/',views.update_cart_location,name='update_cart_location'),
 
     # user address
-    path('profile/address/<int:userId>/',views.address_page,name="address_page"),
+    path('profile/address/',views.address_page,name="address_page"),
     path('profile/address/edit/<int:addressId>/',views.edit_address,name='edit_address'),
     path('profile/address/delete/<int:addressId>/',views.delete_address,name='delete_address'),
 

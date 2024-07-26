@@ -103,7 +103,8 @@ def get_dashboard_data(request):
 
     orders_query = Order.objects.annotate(interval=interval)
     revenue_query = Order.objects.annotate(interval=interval)
-
+    for i in orders_query:
+        print()
     if product_id:
         orders_query = orders_query.filter(items__key_product_id=product_id)
         revenue_query = revenue_query.filter(items__key_product_id=product_id)
@@ -142,9 +143,14 @@ def admin_report(request):
             # Get custom start and end dates from the form
             start_date = request.POST.get('custom_start_date')
             end_date = request.POST.get('custom_end_date')
-            start_date = datetime.strptime(start_date, '%Y-%m-%d')
-            end_date = datetime.strptime(end_date, '%Y-%m-%d')
-           
+            
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date, '%Y-%m-%d')
+                if start_date > end_date:
+                    return render(request,'admin/report.html',{'msg':'Enter a valid date'})
+            except:
+                return render(request,'admin/report.html',{'msg':'Enter a valid date'})
             start_date = datetime.combine(start_date, datetime.min.time())
             end_date = datetime.combine(end_date, datetime.max.time())
         
@@ -269,7 +275,7 @@ def admin_report(request):
                     pisa_status = None
                 # If PDF creation was successful, serve the file as a download
                 if pisa_status == None:
-                    return render(request,'404.html')
+                    return render(request,'404.html',{'msg':'There is no deliverd product for showcase'})
                 if not pisa_status.err:
                     pdf_file.seek(0)  # Reset file pointer
                     response.write(pdf_file.getvalue())
@@ -280,9 +286,11 @@ def admin_report(request):
                     return render(request,'404.html')
 
             # Return the report as an HTTP response
+            report_data = f"Generating report: Type - {report_type}, Custom Start Date - {start_date}, Custom End Date - {end_date}"
             return render(request,'admin/report_preview.html',{'report':report})
+        else:
+            report_data = None
         
-        report_data = f"Generating report: Type - {report_type}, Custom Start Date - {start_date}, Custom End Date - {end_date}"
 
         return HttpResponse(report_data)
 
@@ -339,8 +347,9 @@ def delete_branch(request,branchId):
 ####################### customers #######################
 
 def customers_page(request):
+
     if 'isusername' not in request.session:
-        # Redirect if the user is not logged in
+
         return redirect(signin_page)
 
     customers = vgUser.objects.filter(is_superuser=False).all().order_by('username')
@@ -421,5 +430,4 @@ def delete_coupon(request,couponId):
     coupon = models.Coupon.objects.get(id=couponId)
     coupon.delete()
     return redirect(coupon_page)
-
 

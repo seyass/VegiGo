@@ -1,15 +1,12 @@
 from decimal import Decimal
 from django.shortcuts import render
-from productmanagement.models import Category,Product, Review,Location,ProductLocations
+from productmanagement.models import Category,Product, Review
 from django.db.models import Q,Avg
 from authentication.models import vgUser
 import json
-from django.http import JsonResponse
 from customer.models import Cart,CartItem
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.functions import Coalesce
 from productmanagement.models import Product, CategoryOffer, ProductOffer
-from django.db.models import F, Sum, DecimalField
+
 from django.utils import timezone
 
 def check_offer(productId):

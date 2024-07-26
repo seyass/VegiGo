@@ -1,0 +1,19 @@
+# Ignore virtual environment
+myenv/
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore environment-specific settings files
+*.env
+
+# Ignore database files
+db.sqlite3
+
+VegiGo/media/
+
+

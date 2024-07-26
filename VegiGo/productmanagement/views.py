@@ -379,5 +379,3 @@ def delete_product_offer(request,offerId):
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
-
- 

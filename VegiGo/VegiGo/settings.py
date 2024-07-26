@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-x#5310onza%wtc++uzwix9xipji3j9bgt9p4a1pmtjjppwf*35
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['vegigo.shop','www.vegigo.shop','0.0.0.0','localhost']
+
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -97,11 +98,11 @@ WSGI_APPLICATION = 'VegiGo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vegigodb',
-        'HOST' :'vegigodb.cpoggai6wuj9.eu-north-1.rds.amazonaws.com',
+        'NAME': 'vegigo',
+        'HOST' :'localhost',
         "PORT":'5432',
         "USER":'postgres',
-        "PASSWORD":'Sree8281' 
+        "PASSWORD":'Sre@8281' 
     }
 }
 
@@ -209,7 +210,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_SCOPE = ['profile']
 RAZORPAY_KEY_ID = os.getenv('RAZORPAY_KEY_ID')
 RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET')
 
-SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+#SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 
 

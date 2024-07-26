@@ -129,3 +129,4 @@ class WalletHistory(models.Model):
     def __str__(self):
         return f"{self.wallet.user.username} - {self.transaction_type} - {self.amount} on {self.timestamp}"
  
+

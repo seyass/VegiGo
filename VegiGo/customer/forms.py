@@ -8,9 +8,22 @@ from .models import UserAddress,Cart,CartItem
 
 class UserProfileForm(UserChangeForm):
     password = None  # Remove password field from the form
+    
     class Meta:
         model = vgUser
         fields = ('first_name', 'last_name', 'email')
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        first_name = cleaned_data.get('first_name', '').strip()
+        last_name = cleaned_data.get('last_name', '').strip()
+        
+        if len(first_name) == 0:
+            self.add_error('first_name', 'This field is required')
+        if len(last_name) == 0:
+            self.add_error('last_name', 'This field is required')
+        
+        return cleaned_data
 
 class CartForm(forms.ModelForm):
     class Meta:

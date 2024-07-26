@@ -183,7 +183,8 @@ def signup_page(request):
 def signin_page(request):
 
     # Check if customer is already logged in
-    if 'username' in request.session:
+    if request.user.is_authenticated:
+        return redirect('home_page')
         
         return redirect(home_page)
     elif 'isusername' in request.session:
