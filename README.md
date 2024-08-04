@@ -46,7 +46,7 @@ VegiGo is a comprehensive e-commerce platform built using Python, Django, Postgr
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/seyass/python-django-ecommerce.git
+    git clone https://github.com/sreyasnamboothiris/python-django-ecommerce.git
     cd vegigo
     ```
 
